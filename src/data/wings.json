@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "tech",
+    "name": "Tech 翼",
+    "subtitle": "工程参考室 · Engineering Reference Room",
+    "accent": "#5B7A9A",
+    "featured_slug": "fastapi-migration",
+    "curator_note": "写代码是容易的，知道为什么这样写才难。这个展厅记录工程决策背后的推理过程——哪些路是走通的，哪些是走通了之后又推倒重来的。"
+  },
+  {
+    "slug": "think",
+    "name": "Think 翼",
+    "subtitle": "私人书房 · Private Study",
+    "accent": "#C15F3C",
+    "featured_slug": "cognitive-version-control",
+    "curator_note": "这是想东西想到一半的房间。有些已经想清楚，有些还在路上，有些可能永远都想不清楚。展品按「想清楚的程度」陈列，不按发表时间。"
+  },
+  {
+    "slug": "create",
+    "name": "Create 翼",
+    "subtitle": "项目工坊 · Project Workshop",
+    "accent": "#7A8C5F",
+    "featured_slug": "drift-metal-emotion",
+    "curator_note": "在建的、已发布的、停工的。项目背后的决策记录，比发布公告更诚实——包括为什么放弃，为什么重启，为什么这个时间点把它砍掉。"
+  }
+]

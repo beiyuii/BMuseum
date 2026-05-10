@@ -1,0 +1,144 @@
+.visitor-ticket {
+  position: fixed;
+  z-index: 70;
+  background: #F4ECD6;
+  border: 1px solid rgba(58, 46, 31, 0.15);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: transform 600ms cubic-bezier(.34,1.56,.64,1), opacity 600ms ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  font-family: var(--f-ui);
+  color: #3A2E1F;
+}
+
+.visitor-ticket.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Grand Hall: bottom-left, large */
+.visitor-ticket.grand-hall {
+  bottom: 32px;
+  left: 32px;
+  width: 240px;
+  padding: 16px 20px;
+}
+
+/* Other pages: bottom-right, small */
+.visitor-ticket:not(.grand-hall) {
+  bottom: 20px;
+  right: 20px;
+  width: 140px;
+  padding: 10px 12px;
+  font-size: 10px;
+}
+
+.visitor-ticket:not(.grand-hall) .ticket-brand {
+  font-size: 10px;
+}
+
+.visitor-ticket:not(.grand-hall) .ticket-number {
+  font-size: 10px;
+}
+
+.visitor-ticket:not(.grand-hall) .ticket-valid,
+.visitor-ticket:not(.grand-hall) .ticket-issued {
+  font-size: 8px;
+}
+
+.visitor-ticket:not(.grand-hall) .ticket-seat {
+  font-size: 9px;
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.ticket-brand {
+  font-family: var(--f-ui);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.ticket-number {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.ticket-divider {
+  height: 1px;
+  background: rgba(58, 46, 31, 0.2);
+  margin: 8px 0;
+}
+
+.ticket-valid {
+  font-size: 10px;
+  opacity: 0.6;
+  margin-bottom: 2px;
+}
+
+.ticket-issued {
+  font-size: 10px;
+  opacity: 0.5;
+}
+
+.ticket-perforation {
+  border-top: 1px dashed rgba(58, 46, 31, 0.3);
+  margin: 10px -20px;
+}
+
+.grand-hall .ticket-perforation {
+  margin: 10px -20px;
+}
+
+:not(.grand-hall) .ticket-perforation {
+  margin: 8px -12px;
+}
+
+.ticket-seat {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  opacity: 0.8;
+  letter-spacing: 0.05em;
+}
+
+/* Expanded state */
+.visitor-ticket.expanded {
+  width: auto;
+  max-width: 280px;
+}
+
+.ticket-back {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(58, 46, 31, 0.3);
+}
+
+.ticket-history-label {
+  font-family: var(--f-ui);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+
+.ticket-rooms {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ticket-rooms li {
+  font-size: 11px;
+  padding: 2px 0;
+  opacity: 0.7;
+}

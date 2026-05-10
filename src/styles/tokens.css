@@ -1,0 +1,45 @@
+:root {
+  /* Main color temperature (warm cream-white主线) */
+  --bg:        #F0EEE6;
+  --bg-warm:   #ECE7DA;
+  --bg-card:   #EAE6DC;
+  --ink:       #1F1E1B;
+  --ink-soft:  #5A5750;
+  --ink-faint: #9A9490;
+  --hairline:  rgba(31,30,27,.11);
+  --hairline-s:rgba(31,30,27,.22);
+
+  /* Dark (Hall Preview / Footer / Room Marker ONLY) */
+  --bg-deep:   #1F1E1B;
+  --cream-text:#E8E4D8;
+
+  /* Primary accent (red earth) */
+  --accent:    #C15F3C;
+
+  /* Wing accents */
+  --a-tech:    #5B7A9A;
+  --a-think:   #C15F3C;
+  --a-create:  #7A8C5F;
+
+  /* Guestbook */
+  --bg-guestbook: #F4ECD6;
+  --ink-guestbook:#3A2E1F;
+
+  /* Typography */
+  --f-en:  'Fraunces', Georgia, serif;
+  --f-cn:  'Noto Serif SC', serif;
+  --f-kai: 'LXGW WenKai', 'Kaiti SC', cursive;
+  --f-ui:  'Inter', -apple-system, sans-serif;
+  --f-mono:'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --max-width: 1100px;
+  --content-width: 680px;
+  --pad-x: 40px;
+  --section-gap: 88px;
+
+  /* Animation */
+  --ease-out: cubic-bezier(.2,.7,.2,1);
+  --ease-spring: cubic-bezier(.34,1.56,.64,1);
+  --fade-duration: 200ms;
+}
