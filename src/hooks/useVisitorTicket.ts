@@ -11,8 +11,21 @@ function generateId(): string {
   });
 }
 
-function createTicket(): Visitor {
-  const ticketNo = Math.floor(Math.random() * 9000) + 1000;
+/** 向 Edge Function 请求全局递增票号，失败时 fallback 到随机数 */
+async function fetchTicketNo(): Promise<number> {
+  try {
+    const res = await fetch("/api/visitor/issue", { method: "POST" });
+    if (!res.ok) throw new Error("non-2xx");
+    const data = (await res.json()) as { ticket_no: number };
+    return data.ticket_no;
+  } catch {
+    // 本地开发或 KV 不可用时降级到随机号
+    return Math.floor(Math.random() * 9000) + 1000;
+  }
+}
+
+async function createTicket(): Promise<Visitor> {
+  const ticketNo = await fetchTicketNo();
   return {
     id: generateId(),
     ticket_no: ticketNo,
@@ -40,18 +53,21 @@ export function useVisitorTicket() {
         setVisitor(parsed);
         setIsNew(false);
       } catch {
-        const ticket = createTicket();
+        // localStorage 数据损坏，重新发放
+        void createTicket().then((ticket) => {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(ticket));
+          setVisitor(ticket);
+          setIsNew(true);
+          setTimeout(() => setShowTicket(true), 2500);
+        });
+      }
+    } else {
+      void createTicket().then((ticket) => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(ticket));
         setVisitor(ticket);
         setIsNew(true);
         setTimeout(() => setShowTicket(true), 2500);
-      }
-    } else {
-      const ticket = createTicket();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(ticket));
-      setVisitor(ticket);
-      setIsNew(true);
-      setTimeout(() => setShowTicket(true), 2500);
+      });
     }
   }, []);
 
