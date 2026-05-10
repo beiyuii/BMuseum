@@ -10,7 +10,7 @@
 
 ## 🔗 在线预览
 
-> 部署链接将在提交后更新
+> https://b-museum.edgeone.dev/
 
 ## 📋 AI 构建 Prompt
 
