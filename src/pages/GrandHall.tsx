@@ -15,15 +15,6 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
   const hallRevealRef = useReveal();
   const lastDarkRef = useRef(false);
 
-  /* ── 回访者穿门动画收短（首访保留完整 220vh）── */
-  const isReturning = useMemo(() => {
-    try {
-      return !!localStorage.getItem('bmuseum_visitor');
-    } catch {
-      return false;
-    }
-  }, []);
-
   const nowItems = useMemo(() => latestProjectUpdates(2), []);
 
   const skipToHall = () => {
@@ -81,77 +72,82 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
           ══════════════════════════════════════════ */}
       <section className="hero">
         <div className="hero-body">
-          <p className="eyebrow hero-eyebrow">
-            ● Tech · Think · Create / curated solo, opened after the workday
-          </p>
+          {/* 左：原有诗意主视觉，保持完整气势 */}
+          <div className="hero-main">
+            <p className="eyebrow hero-eyebrow">
+              ● Tech · Think · Create / curated solo, opened after the workday
+            </p>
 
-          <h1 className="hero-title">
-            <span className="hero-line hero-line-1">白天写代码，</span>
-            <span className="hero-line hero-line-2">
-              夜里<span className="kaiti">收藏</span>
-            </span>
-            <span className="hero-line hero-line-3">想清楚的事。</span>
-          </h1>
+            <h1 className="hero-title">
+              <span className="hero-line hero-line-1">白天写代码，</span>
+              <span className="hero-line hero-line-2">
+                夜里<span className="kaiti">收藏</span>
+              </span>
+              <span className="hero-line hero-line-3">想清楚的事。</span>
+            </h1>
 
-          <p className="hero-subtitle">
-            By day, I ship. By night, I curate what survived the thinking.
-            <br />
-            — 三个展厅，一年一馆。
-          </p>
-
-          {/* ── 馆长铭牌：10 秒认识馆长的快速通道 ── */}
-          <div className="curator-plaque">
-            <div className="curator-plaque-avatar">B</div>
-            <div className="curator-plaque-body">
-              <div className="curator-plaque-name">
-                BEIYUII
-                <span className="curator-plaque-role">Curator · 馆长</span>
-              </div>
-              <p className="curator-plaque-line">
-                00 后全栈 → AI 应用开发者。正在做 才驿 · 图文故事工厂 · Personal API Skill。
-              </p>
-              <div className="curator-plaque-actions">
-                <Link to="/projects" className="plaque-btn plaque-btn--solid">
-                  看项目 →
-                </Link>
-                <Link to="/wing/think" className="plaque-btn">
-                  读思考
-                </Link>
-                <a href="#find-curator" className="plaque-btn">
-                  找到我 ↓
-                </a>
-              </div>
-              <div className="curator-plaque-channels">
-                {socials.map((s) =>
-                  s.url ? (
-                    <a key={s.key} href={s.url} target="_blank" rel="noopener noreferrer">
-                      {s.label}
-                    </a>
-                  ) : (
-                    <a key={s.key} href="#find-curator">
-                      {s.label}
-                    </a>
-                  )
-                )}
-              </div>
-            </div>
+            <p className="hero-subtitle">
+              By day, I ship. By night, I curate what survived the thinking.
+              <br />
+              — 三个展厅，一年一馆。
+            </p>
           </div>
 
-          {nowItems.length > 0 && (
-            <div className="hero-now">
-              <span className="hero-now-label">Now</span>
-              <span className="hero-now-text">
-                {nowItems
-                  .map((p) => `${p.name} ${p.auto.version ?? ''} · 更新于 ${p.auto.updated}`)
-                  .join('　')}
-              </span>
-              <Link to="/projects" className="hero-now-link">
-                全部近况 →
-              </Link>
+          {/* 右：馆长铭牌，像挂在展墙上的说明牌 */}
+          <aside className="hero-aside">
+            <div className="curator-plaque">
+              <div className="curator-plaque-avatar">B</div>
+              <div className="curator-plaque-body">
+                <div className="curator-plaque-name">
+                  BEIYUII
+                  <span className="curator-plaque-role">Curator · 馆长</span>
+                </div>
+                <p className="curator-plaque-line">
+                  00 后全栈 → AI 应用开发者。正在做 才驿 · 图文故事工厂 · Personal API Skill。
+                </p>
+                <div className="curator-plaque-actions">
+                  <Link to="/projects" className="plaque-btn plaque-btn--solid">
+                    看项目 →
+                  </Link>
+                  <Link to="/wing/think" className="plaque-btn">
+                    读思考
+                  </Link>
+                  <a href="#find-curator" className="plaque-btn">
+                    找到我 ↓
+                  </a>
+                </div>
+                <div className="curator-plaque-channels">
+                  {socials.map((s) =>
+                    s.url ? (
+                      <a key={s.key} href={s.url} target="_blank" rel="noopener noreferrer">
+                        {s.label}
+                      </a>
+                    ) : (
+                      <a key={s.key} href="#find-curator">
+                        {s.label}
+                      </a>
+                    )
+                  )}
+                </div>
+              </div>
             </div>
-          )}
 
-          <div className="plate-rule">
+            {nowItems.length > 0 && (
+              <div className="hero-now">
+                <span className="hero-now-label">Now</span>
+                <span className="hero-now-text">
+                  {nowItems
+                    .map((p) => `${p.name} ${p.auto.version ?? ''} · 更新于 ${p.auto.updated}`)
+                    .join('　')}
+                </span>
+                <Link to="/projects" className="hero-now-link">
+                  全部近况 →
+                </Link>
+              </div>
+            )}
+          </aside>
+
+          <div className="plate-rule hero-plate">
             <span>Vol. 01 · One-author archive / est. 2026</span>
           </div>
         </div>
@@ -160,11 +156,7 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
       {/* ══════════════════════════════════════════
           Segment B – Threshold (220vh scroll)
           ══════════════════════════════════════════ */}
-      <section
-        className="threshold"
-        ref={thresholdRef}
-        style={isReturning ? { height: '120vh' } : undefined}
-      >
+      <section className="threshold" ref={thresholdRef}>
         <div className="threshold-stage">
           <div
             className="threshold-door"
