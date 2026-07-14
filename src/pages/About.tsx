@@ -1,5 +1,6 @@
 import "./About.css";
 import { useReveal } from "../hooks/useReveal";
+import { projects, socials } from "../data/content";
 
 /* ------------------------------------------------------------------ */
 /*  Reveal wrapper – one per section                                   */
@@ -63,57 +64,12 @@ const loopNodes = [
   { key: "iterate", en: "Iterate", cn: "迭代", note: "带数据进下一轮" },
 ];
 
-interface ShipCard {
-  no: string;
-  name: string;
-  subtitle: string;
-  platform: string;
-  status: string;
-  tech: string[];
-  accent: string;
-  accentClass: string;
-  desc: string;
-  link: string;
-}
-
-const ships: ShipCard[] = [
-  {
-    no: "SHIP-01",
-    name: "rencai",
-    subtitle: "人才政策助手",
-    platform: "微信小程序",
-    status: "生产环境运行中",
-    tech: ["FastAPI", "微信小程序", "腾讯云"],
-    accent: "red-earth",
-    accentClass: "red-earth",
-    desc: "智能人才政策匹配与查询工具，帮助用户快速找到适用的人才引进政策和补贴方案。",
-    link: "#",
-  },
-  {
-    no: "SHIP-02",
-    name: "Drift",
-    subtitle: "情绪沉淀",
-    platform: "iOS",
-    status: "MVP 可体验",
-    tech: ["SwiftUI", "Metal", "Apple Vision"],
-    accent: "steel-blue",
-    accentClass: "steel-blue",
-    desc: "通过视觉化情绪轨迹帮助用户记录、理解和沉淀每日情绪状态的 iOS 应用。",
-    link: "#",
-  },
-  {
-    no: "SHIP-03",
-    name: "Personal API",
-    subtitle: "AI 身份层",
-    platform: "v2.0.0",
-    status: "v2.0.0 · 开源运行中",
-    tech: ["Obsidian", "Agent SDK", "Hermes"],
-    accent: "moss-green",
-    accentClass: "moss-green",
-    desc: "用结构化文档构建个人 AI 知识接口，让 AI 真正理解你是谁、你在做什么。",
-    link: "#",
-  },
-];
+/* 项目卡数据统一来自 src/data/projects.json（与 /projects 页同源，同步脚本自动更新） */
+const ACCENT_CLASSES: Record<string, string> = {
+  "#C15F3C": "red-earth",
+  "#5B7A9A": "steel-blue",
+  "#7A8C5F": "moss-green",
+};
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -148,7 +104,7 @@ export default function About() {
             <tbody>
               <tr>
                 <td>名号</td>
-                <td>大佬</td>
+                <td>BEIYUII</td>
               </tr>
               <tr>
                 <td>世代</td>
@@ -259,29 +215,40 @@ export default function About() {
           <span className="dot" /> Currently Shipping · 正在运行
         </p>
         <div className="about-shipping-grid">
-          {ships.map((s) => (
-            <div className="about-ship-card" key={s.no}>
-              <div className={`about-ship-card-accent ${s.accentClass}`} />
+          {projects.map((p, i) => (
+            <div className="about-ship-card" key={p.slug}>
+              <div
+                className={`about-ship-card-accent ${ACCENT_CLASSES[p.accent] ?? "red-earth"}`}
+              />
               <div className="about-ship-card-inner">
                 <div className="about-ship-card-no">
-                  {s.no} · {s.platform}
+                  SHIP-{String(i + 1).padStart(2, "0")} · {p.platform}
                 </div>
-                <div className="about-ship-card-name">{s.name}</div>
-                <div className="about-ship-card-subtitle">{s.subtitle}</div>
+                <div className="about-ship-card-name">{p.name}</div>
+                <div className="about-ship-card-subtitle">
+                  {p.name_en ?? p.platform}
+                </div>
                 <div className="about-ship-card-status">
                   <span className="status-dot" />
-                  {s.status}
+                  {p.auto.version ? `${p.auto.version} · ` : ""}
+                  {p.status_label}
                 </div>
                 <div className="about-ship-card-tags">
-                  {s.tech.map((t) => (
+                  {p.tech.map((t) => (
                     <span className="about-ship-card-tag" key={t}>
                       {t}
                     </span>
                   ))}
                 </div>
-                <div className="about-ship-card-desc">{s.desc}</div>
+                <div className="about-ship-card-desc">{p.tagline}</div>
                 <div className="about-ship-card-footer">
-                  <a href={s.link}>查看项目 →</a>
+                  <a
+                    href={p.links[0]?.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    查看项目 →
+                  </a>
                 </div>
               </div>
             </div>
@@ -327,22 +294,18 @@ export default function About() {
             <p>有想法、有问题、或者只是想聊聊，都可以找到我。</p>
           </div>
           <div className="about-contact-links">
-            <a
-              href="https://github.com/beiyuii"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="contact-link-label">GitHub</span>
-              <span className="contact-link-handle">@beiyuii</span>
-              <span className="contact-link-arrow">↗</span>
-            </a>
-            <a href="mailto:huangziting495@gmail.com">
-              <span className="contact-link-label">Email</span>
-              <span className="contact-link-handle">
-                huangziting495@gmail.com
-              </span>
-              <span className="contact-link-arrow">↗</span>
-            </a>
+            {socials.map((s) => (
+              <a
+                key={s.key}
+                href={s.url ?? "#find-curator"}
+                target={s.url && !s.url.startsWith("mailto:") ? "_blank" : undefined}
+                rel="noopener noreferrer"
+              >
+                <span className="contact-link-label">{s.label}</span>
+                <span className="contact-link-handle">{s.name}</span>
+                <span className="contact-link-arrow">{s.url ? "↗" : "↓"}</span>
+              </a>
+            ))}
           </div>
         </div>
         <p className="about-contact-footer">

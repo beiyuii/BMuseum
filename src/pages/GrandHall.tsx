@@ -2,9 +2,7 @@ import { useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollProgress } from '../hooks/useScrollProgress';
 import { useReveal } from '../hooks/useReveal';
-import wings from '../data/wings.json';
-import articles from '../data/articles.json';
-import type { Wing, Article } from '../types';
+import { articles, wings, socials, latestProjectUpdates } from '../data/content';
 import './GrandHall.css';
 
 interface GrandHallProps {
@@ -16,6 +14,21 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
   const progress = useScrollProgress(thresholdRef);
   const hallRevealRef = useReveal();
   const lastDarkRef = useRef(false);
+
+  /* ── 回访者穿门动画收短（首访保留完整 220vh）── */
+  const isReturning = useMemo(() => {
+    try {
+      return !!localStorage.getItem('bmuseum_visitor');
+    } catch {
+      return false;
+    }
+  }, []);
+
+  const nowItems = useMemo(() => latestProjectUpdates(2), []);
+
+  const skipToHall = () => {
+    document.getElementById('hall')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   /* ── Easing: ease-in-out quadratic ──────────── */
   const eased =
@@ -55,7 +68,7 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
   /* ── Count exhibits per wing ────────────────── */
   const wingCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    (articles as Article[]).forEach((a) => {
+    articles.forEach((a) => {
       counts[a.wing] = (counts[a.wing] || 0) + 1;
     });
     return counts;
@@ -86,6 +99,58 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
             — 三个展厅，一年一馆。
           </p>
 
+          {/* ── 馆长铭牌：10 秒认识馆长的快速通道 ── */}
+          <div className="curator-plaque">
+            <div className="curator-plaque-avatar">B</div>
+            <div className="curator-plaque-body">
+              <div className="curator-plaque-name">
+                BEIYUII
+                <span className="curator-plaque-role">Curator · 馆长</span>
+              </div>
+              <p className="curator-plaque-line">
+                00 后全栈 → AI 应用开发者。正在做 才驿 · 图文故事工厂 · Personal API Skill。
+              </p>
+              <div className="curator-plaque-actions">
+                <Link to="/projects" className="plaque-btn plaque-btn--solid">
+                  看项目 →
+                </Link>
+                <Link to="/wing/think" className="plaque-btn">
+                  读思考
+                </Link>
+                <a href="#find-curator" className="plaque-btn">
+                  找到我 ↓
+                </a>
+              </div>
+              <div className="curator-plaque-channels">
+                {socials.map((s) =>
+                  s.url ? (
+                    <a key={s.key} href={s.url} target="_blank" rel="noopener noreferrer">
+                      {s.label}
+                    </a>
+                  ) : (
+                    <a key={s.key} href="#find-curator">
+                      {s.label}
+                    </a>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+
+          {nowItems.length > 0 && (
+            <div className="hero-now">
+              <span className="hero-now-label">Now</span>
+              <span className="hero-now-text">
+                {nowItems
+                  .map((p) => `${p.name} ${p.auto.version ?? ''} · 更新于 ${p.auto.updated}`)
+                  .join('　')}
+              </span>
+              <Link to="/projects" className="hero-now-link">
+                全部近况 →
+              </Link>
+            </div>
+          )}
+
           <div className="plate-rule">
             <span>Vol. 01 · One-author archive / est. 2026</span>
           </div>
@@ -95,7 +160,11 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
       {/* ══════════════════════════════════════════
           Segment B – Threshold (220vh scroll)
           ══════════════════════════════════════════ */}
-      <section className="threshold" ref={thresholdRef}>
+      <section
+        className="threshold"
+        ref={thresholdRef}
+        style={isReturning ? { height: '120vh' } : undefined}
+      >
         <div className="threshold-stage">
           <div
             className="threshold-door"
@@ -117,6 +186,9 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
           <div className={`threshold-cue ${showCue ? 'visible' : ''}`}>
             继续向下 · Step inside
             <span className="cue-arrow">↓</span>
+            <button className="threshold-skip" onClick={skipToHall}>
+              跳过 · 直接入馆
+            </button>
           </div>
         </div>
       </section>
@@ -125,6 +197,7 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
           Segment C – Hall Preview (Dark)
           ══════════════════════════════════════════ */}
       <section
+        id="hall"
         className="hall-preview reveal"
         ref={hallRevealRef as React.Ref<HTMLDivElement>}
       >
@@ -139,7 +212,7 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
           </h2>
 
           <div className="wing-grid">
-            {(wings as Wing[]).map((wing, i) => (
+            {wings.map((wing, i) => (
               <Link
                 key={wing.slug}
                 to={`/wing/${wing.slug}`}

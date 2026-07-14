@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# EdgeOne Pages 本地构建缓存
+.edgeone
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

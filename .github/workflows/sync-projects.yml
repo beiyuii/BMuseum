@@ -1,0 +1,37 @@
+name: Sync project data
+
+on:
+  schedule:
+    # 每日 04:00（Asia/Shanghai）= 20:00 UTC
+    - cron: "0 20 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Sync project data from GitHub API
+        run: node scripts/sync-projects.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- src/data/projects.json; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name "bmuseum-sync[bot]"
+          git config user.email "actions@github.com"
+          git add src/data/projects.json
+          git commit -m "chore: sync project data ($(date -u +%F))"
+          git push

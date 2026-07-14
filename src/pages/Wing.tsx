@@ -1,9 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
-import type { Article, Wing as WingType } from '../types';
+import type { Article } from '../types';
 import { useReveal } from '../hooks/useReveal';
-import articlesData from '../data/articles.json';
-import wingsData from '../data/wings.json';
+import { articles as allVisible, wings as wingsList } from '../data/content';
 import './Wing.css';
 
 const WING_NUMBERS: Record<string, string> = {
@@ -23,13 +22,13 @@ export default function Wing() {
   const navigate = useNavigate();
 
   const wing = useMemo(
-    () => (wingsData as WingType[]).find((w) => w.slug === slug),
+    () => wingsList.find((w) => w.slug === slug),
     [slug]
   );
 
   const articles = useMemo(
     () =>
-      (articlesData as Article[])
+      allVisible
         .filter((a) => a.wing === slug)
         .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()),
     [slug]

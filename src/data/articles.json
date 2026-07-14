@@ -11,8 +11,14 @@
     "updated": "2026-05-09",
     "version": "v1.0",
     "featured": true,
-    "tags": ["FastAPI", "NestJS", "架构决策", "rencai"],
-    "reading_time_min": 7
+    "tags": [
+      "FastAPI",
+      "NestJS",
+      "架构决策",
+      "rencai"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
   },
   {
     "slug": "multi-agent-collaboration",
@@ -26,8 +32,14 @@
     "updated": "2026-05-01",
     "version": "v1.1",
     "featured": true,
-    "tags": ["Agent", "多Agent协作", "Claude", "工程化"],
-    "reading_time_min": 6
+    "tags": [
+      "Agent",
+      "多Agent协作",
+      "Claude",
+      "工程化"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
   },
   {
     "slug": "memory-architecture",
@@ -41,8 +53,14 @@
     "updated": "2026-04-20",
     "version": "v1.0",
     "featured": false,
-    "tags": ["记忆架构", "AI", "Agent", "MIRIX"],
-    "reading_time_min": 7
+    "tags": [
+      "记忆架构",
+      "AI",
+      "Agent",
+      "MIRIX"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
   },
   {
     "slug": "cost-performance-balance",
@@ -56,8 +74,14 @@
     "updated": "2026-04-22",
     "version": "v1.0",
     "featured": false,
-    "tags": ["成本优化", "模型选型", "AI", "工程化"],
-    "reading_time_min": 5
+    "tags": [
+      "成本优化",
+      "模型选型",
+      "AI",
+      "工程化"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
   },
   {
     "slug": "personal-api-engineering",
@@ -71,8 +95,14 @@
     "updated": "2026-05-09",
     "version": "v2.0",
     "featured": false,
-    "tags": ["Obsidian", "Personal API", "上下文工程", "开源"],
-    "reading_time_min": 6
+    "tags": [
+      "Obsidian",
+      "Personal API",
+      "上下文工程",
+      "开源"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
   },
   {
     "slug": "docker-linux-pitfalls",
@@ -86,8 +116,14 @@
     "updated": "2026-05-09",
     "version": "v1.0",
     "featured": false,
-    "tags": ["Docker", "部署", "腾讯云", "踩坑"],
-    "reading_time_min": 6
+    "tags": [
+      "Docker",
+      "部署",
+      "腾讯云",
+      "踩坑"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
   },
   {
     "slug": "service-as-software",
@@ -101,8 +137,14 @@
     "updated": "2026-04-20",
     "version": "v1.0",
     "featured": true,
-    "tags": ["SaaS", "商业模式", "AI", "产品思考"],
-    "reading_time_min": 6
+    "tags": [
+      "SaaS",
+      "商业模式",
+      "AI",
+      "产品思考"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
   },
   {
     "slug": "opc-three-stages",
@@ -116,8 +158,14 @@
     "updated": "2026-04-25",
     "version": "v1.0",
     "featured": false,
-    "tags": ["OPC", "一人公司", "商业模式", "增长"],
-    "reading_time_min": 7
+    "tags": [
+      "OPC",
+      "一人公司",
+      "商业模式",
+      "增长"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
   },
   {
     "slug": "second-brain-methodology",
@@ -131,8 +179,14 @@
     "updated": "2026-04-28",
     "version": "v1.1",
     "featured": false,
-    "tags": ["知识管理", "第二大脑", "Obsidian", "PKM"],
-    "reading_time_min": 6
+    "tags": [
+      "知识管理",
+      "第二大脑",
+      "Obsidian",
+      "PKM"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
   },
   {
     "slug": "knowledge-versioning",
@@ -146,8 +200,14 @@
     "updated": "2026-04-22",
     "version": "v1.0",
     "featured": false,
-    "tags": ["版本控制", "知识管理", "认知", "方法论"],
-    "reading_time_min": 5
+    "tags": [
+      "版本控制",
+      "知识管理",
+      "认知",
+      "方法论"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
   },
   {
     "slug": "open-questions-ai",
@@ -161,8 +221,14 @@
     "updated": "2026-04-30",
     "version": "v0.9",
     "featured": false,
-    "tags": ["AI", "上下文工程", "未解问题", "思考"],
-    "reading_time_min": 5
+    "tags": [
+      "AI",
+      "上下文工程",
+      "未解问题",
+      "思考"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
   },
   {
     "slug": "rencai",
@@ -176,8 +242,14 @@
     "updated": "2026-05-09",
     "version": "v2.1",
     "featured": true,
-    "tags": ["rencai", "微信小程序", "AI顾问", "产品"],
-    "reading_time_min": 7
+    "tags": [
+      "rencai",
+      "微信小程序",
+      "AI顾问",
+      "产品"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
   },
   {
     "slug": "drift",
@@ -191,8 +263,15 @@
     "updated": "2026-05-09",
     "version": "v0.8",
     "featured": true,
-    "tags": ["Drift", "iOS", "SwiftUI", "情绪", "产品"],
-    "reading_time_min": 7
+    "tags": [
+      "Drift",
+      "iOS",
+      "SwiftUI",
+      "情绪",
+      "产品"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
   },
   {
     "slug": "personal-api-project",
@@ -206,8 +285,14 @@
     "updated": "2026-05-09",
     "version": "v2.0",
     "featured": false,
-    "tags": ["Personal API", "开源", "Obsidian", "上下文工程"],
-    "reading_time_min": 6
+    "tags": [
+      "Personal API",
+      "开源",
+      "Obsidian",
+      "上下文工程"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
   },
   {
     "slug": "gpu-compass-postmortem",
@@ -221,8 +306,14 @@
     "updated": "2026-04-14",
     "version": "v1.0",
     "featured": false,
-    "tags": ["GPU Compass", "停工复盘", "商业模式", "创业"],
-    "reading_time_min": 6
+    "tags": [
+      "GPU Compass",
+      "停工复盘",
+      "商业模式",
+      "创业"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
   },
   {
     "slug": "hermes-stock-predict",
@@ -236,8 +327,14 @@
     "updated": "2026-05-07",
     "version": "v3.1",
     "featured": false,
-    "tags": ["A股", "AI预测", "Hermes", "归档"],
-    "reading_time_min": 5
+    "tags": [
+      "A股",
+      "AI预测",
+      "Hermes",
+      "归档"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
   },
   {
     "slug": "bmuseum-build",
@@ -251,8 +348,14 @@
     "updated": "2026-05-10",
     "version": "v1.0",
     "featured": true,
-    "tags": ["B.Museum", "产品", "设计", "EdgeOne"],
-    "reading_time_min": 5
+    "tags": [
+      "B.Museum",
+      "产品",
+      "设计",
+      "EdgeOne"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
   },
   {
     "slug": "eight-agent-matrix",
@@ -266,7 +369,13 @@
     "updated": "2026-04-25",
     "version": "v1.0",
     "featured": false,
-    "tags": ["多Agent", "OPC", "自动化", "增长"],
-    "reading_time_min": 6
+    "tags": [
+      "多Agent",
+      "OPC",
+      "自动化",
+      "增长"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
   }
 ]

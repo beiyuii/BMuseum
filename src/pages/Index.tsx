@@ -1,14 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import articlesData from '../data/articles.json';
-import wingsData from '../data/wings.json';
+import { articles, wings } from '../data/content';
 import type { Article, Wing, WingSlug } from '../types';
 import './Index.css';
 
 type ViewMode = 'time' | 'wing' | 'tag';
-
-const articles: Article[] = articlesData as Article[];
-const wings: Wing[] = wingsData as Wing[];
 
 const wingMap: Record<WingSlug, Wing> = Object.fromEntries(
   wings.map(w => [w.slug, w])

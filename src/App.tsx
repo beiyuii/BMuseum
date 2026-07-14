@@ -10,6 +10,7 @@ import About from "./pages/About";
 import Wing from "./pages/Wing";
 import ArticleDetail from "./pages/ArticleDetail";
 import Index from "./pages/Index";
+import Projects from "./pages/Projects";
 import Guestbook from "./pages/Guestbook";
 
 function ScrollToTop() {
@@ -50,6 +51,7 @@ function AppContent() {
         <Route path="/wing/:slug" element={<Wing />} />
         <Route path="/article/:slug" element={<ArticleDetail />} />
         <Route path="/index" element={<Index />} />
+        <Route path="/projects" element={<Projects />} />
         <Route path="/guestbook" element={<Guestbook />} />
       </Routes>
       <Footer className={isGrandHall ? "footer--grand-hall" : undefined} />

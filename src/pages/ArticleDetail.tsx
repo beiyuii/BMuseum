@@ -1,8 +1,6 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useRef, useState, useEffect, useCallback } from 'react';
-import articlesData from '../data/articles.json';
-import wingsData from '../data/wings.json';
-import type { Article, Wing } from '../types';
+import { articles as visibleArticles, allArticles, wings as wingsList } from '../data/content';
 import './ArticleDetail.css';
 
 /* ── simple markdown → HTML ───────────────────────────────── */
@@ -89,15 +87,14 @@ export default function ArticleDetail() {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
 
-  const articles = articlesData as Article[];
-  const wings = wingsData as Wing[];
-
-  const article = articles.find((a) => a.slug === slug);
-  const wing = article ? wings.find((w) => w.slug === article.wing) : undefined;
+  // 直链允许命中库房文章（下方渲染撤展提示），列表与上一/下一篇只走展出中的文章
+  const article = allArticles.find((a) => a.slug === slug);
+  const wing = article ? wingsList.find((w) => w.slug === article.wing) : undefined;
+  const inStorage = !!article && (article.status ?? 'on_display') !== 'on_display';
 
   // prev / next within same wing
   const wingArticles = article
-    ? articles.filter((a) => a.wing === article.wing).sort((a, b) => a.no - b.no)
+    ? visibleArticles.filter((a) => a.wing === article.wing).sort((a, b) => a.no - b.no)
     : [];
   const idx = wingArticles.findIndex((a) => a.slug === slug);
   const prev = idx > 0 ? wingArticles[idx - 1] : undefined;
@@ -128,6 +125,16 @@ export default function ArticleDetail() {
       <div className="article-detail not-found">
         <h2>展品未找到</h2>
         <p>编号 "{slug}" 在馆藏目录中不存在。</p>
+        <Link to="/index" className="back-link">← 返回目录</Link>
+      </div>
+    );
+  }
+
+  if (inStorage) {
+    return (
+      <div className="article-detail not-found">
+        <h2>此展品已撤展</h2>
+        <p>《{article.title}》已移入库房，等待馆长重新策展后再次展出。</p>
         <Link to="/index" className="back-link">← 返回目录</Link>
       </div>
     );

@@ -10,6 +10,134 @@
   margin-top: 0;
 }
 
+/* ── Find the curator · 馆长在别处 ── */
+
+.footer-find {
+  margin-bottom: 48px;
+}
+
+.footer-find-grid {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.footer-qr-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-qr-card {
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 3px;
+  padding: 10px 12px 9px;
+  text-align: center;
+  width: 124px;
+}
+
+.footer-qr-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 2px;
+}
+
+.footer-qr-fallback {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  border: 1px dashed var(--hairline-s);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.footer-qr-fallback-label {
+  font-family: var(--f-cn);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.footer-qr-fallback-id {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--ink-soft);
+  padding: 0 6px;
+  word-break: break-all;
+}
+
+.footer-qr-caption {
+  font-family: var(--f-ui);
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footer-qr-id {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+.footer-find-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 240px;
+  padding-top: 4px;
+}
+
+.footer-find-links a {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 13px;
+  opacity: 0.85;
+  border-bottom: 1px solid rgba(232, 228, 216, 0.12);
+  padding-bottom: 8px;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.footer-find-links a:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.footer-find-platform {
+  font-family: var(--f-ui);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.footer-find-name {
+  font-family: var(--f-ui);
+  text-align: right;
+  word-break: break-all;
+}
+
+.footer-find-hr {
+  margin-top: 40px;
+  margin-bottom: 0;
+}
+
 .footer-inner {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

@@ -23,6 +23,7 @@ export default function Nav({ onDark = false }: NavProps) {
       <div className="nav-inner container">
         <Link to="/" className="nav-brand">B.Museum</Link>
         <div className="nav-links">
+          <Link to="/projects" className={location.pathname === '/projects' ? 'active' : ''}>Projects</Link>
           <Link to="/index" className={location.pathname === '/index' ? 'active' : ''}>Index</Link>
           <Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>About</Link>
           <Link to="/guestbook" className={location.pathname === '/guestbook' ? 'active' : ''}>Guest Book</Link>

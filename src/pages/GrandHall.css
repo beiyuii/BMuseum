@@ -48,7 +48,8 @@ body.grand-hall-entering .nav {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 0 var(--pad-x) 80px;
+    /* 顶部留出固定导航高度：铭牌加入后内容可能超过一屏，不能顶到 nav 下面 */
+    padding: 96px var(--pad-x) 64px;
     position: relative;
 }
 
@@ -58,7 +59,7 @@ body.grand-hall-entering .nav {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 22px;
 }
 
 /* Eyebrow – fade in */
@@ -105,6 +106,176 @@ body.grand-hall-entering .nav {
     color: var(--ink-soft);
     max-width: 560px;
     animation: heroFade 1.4s ease 1.4s both;
+}
+
+/* ── 馆长铭牌（Curator Plaque）────────────────── */
+
+.curator-plaque {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    background: var(--bg-card);
+    border: 1px solid var(--hairline-s);
+    border-radius: 3px;
+    padding: 20px 22px;
+    max-width: 640px;
+    animation: heroFade 1.4s ease 1.7s both;
+}
+
+.curator-plaque-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--bg-deep);
+    color: var(--cream-text);
+    font-family: var(--f-en);
+    font-style: italic;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.curator-plaque-body {
+    min-width: 0;
+    flex: 1;
+}
+
+.curator-plaque-name {
+    font-family: var(--f-en);
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.curator-plaque-role {
+    font-family: var(--f-ui);
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+}
+
+.curator-plaque-line {
+    font-family: var(--f-cn);
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    margin-top: 6px;
+}
+
+.curator-plaque-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+.plaque-btn {
+    font-family: var(--f-ui);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 2px;
+    border: 1px solid var(--hairline-s);
+    color: var(--ink);
+    background: transparent;
+    cursor: pointer;
+    transition: color var(--fade-duration) ease, border-color var(--fade-duration) ease,
+        background var(--fade-duration) ease;
+    text-decoration: none;
+}
+
+.plaque-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.plaque-btn--solid {
+    background: var(--bg-deep);
+    border-color: var(--bg-deep);
+    color: var(--cream-text);
+}
+
+.plaque-btn--solid:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--cream-text);
+}
+
+.curator-plaque-channels {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.curator-plaque-channels a {
+    font-family: var(--f-ui);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    border: 1px solid var(--hairline);
+    border-radius: 100px;
+    padding: 3px 10px;
+    text-decoration: none;
+    transition: color var(--fade-duration) ease, border-color var(--fade-duration) ease;
+}
+
+.curator-plaque-channels a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+/* ── Now 近况条（数据来自 projects.json，自动同步）── */
+
+.hero-now {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    max-width: 640px;
+    border-left: 2px solid var(--accent);
+    background: rgba(193, 95, 60, 0.06);
+    padding: 9px 14px;
+    animation: heroFade 1.4s ease 1.9s both;
+}
+
+.hero-now-label {
+    font-family: var(--f-ui);
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.hero-now-text {
+    font-family: var(--f-ui);
+    font-size: 12px;
+    color: var(--ink-soft);
+    flex: 1;
+    min-width: 200px;
+}
+
+.hero-now-link {
+    font-family: var(--f-ui);
+    font-size: 12px;
+    color: var(--ink-faint);
+    text-decoration: none;
+    transition: color var(--fade-duration) ease;
+}
+
+.hero-now-link:hover {
+    color: var(--accent);
 }
 
 /* Plate rule – fade in last */
@@ -251,6 +422,26 @@ body.grand-hall-entering .nav {
 .threshold-cue .cue-arrow {
     display: inline-block;
     animation: cueBounce 1.5s ease-in-out infinite;
+}
+
+/* 跳过按钮：明确的直达出口，压在任何底色上都可读 */
+.threshold-skip {
+    margin-left: 14px;
+    font-family: var(--f-ui);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 2px;
+    background: rgba(240, 238, 230, 0.92);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background var(--fade-duration) ease, color var(--fade-duration) ease;
+}
+
+.threshold-skip:hover {
+    background: var(--accent);
+    color: var(--cream-text);
 }
 
 /* ═══════════════════════════════════════════════════

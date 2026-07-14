@@ -1,0 +1,45 @@
+[
+  {
+    "key": "xiaohongshu",
+    "label": "小红书",
+    "name": "Gnimnehs.",
+    "id_label": "小红书号",
+    "id": "9518149298",
+    "qr": "/social/xiaohongshu.jpg"
+  },
+  {
+    "key": "douyin",
+    "label": "抖音",
+    "name": "黄 sir 的 AI 实践录",
+    "id_label": "抖音号",
+    "id": "35068903271",
+    "qr": "/social/douyin.jpg"
+  },
+  {
+    "key": "zhihu",
+    "label": "知乎",
+    "name": "黄 sir 的 AI 实践录",
+    "qr": "/social/zhihu.jpg"
+  },
+  {
+    "key": "bilibili",
+    "label": "B站",
+    "name": "别慌上 AI",
+    "id_label": "UID",
+    "id": "21612708",
+    "url": "https://space.bilibili.com/21612708",
+    "qr": "/social/bilibili.jpg"
+  },
+  {
+    "key": "github",
+    "label": "GitHub",
+    "name": "@beiyuii",
+    "url": "https://github.com/beiyuii"
+  },
+  {
+    "key": "email",
+    "label": "Email",
+    "name": "huangziting495@gmail.com",
+    "url": "mailto:huangziting495@gmail.com"
+  }
+]
