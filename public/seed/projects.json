@@ -1,5 +1,5 @@
 {
-  "synced_at": "2026-07-13",
+  "synced_at": "2026-08-03",
   "projects": [
     {
       "slug": "caiyi",
@@ -82,7 +82,7 @@
       "auto": {
         "version": "v2.0.3",
         "updated": "2026-05-15",
-        "stars": 61
+        "stars": 69
       }
     }
   ]

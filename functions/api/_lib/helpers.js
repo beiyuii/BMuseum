@@ -9,18 +9,12 @@ export const CORS_HEADERS = {
   'Content-Type': 'application/json',
 };
 
-export function json(body: unknown, status = 200): Response {
+export function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: CORS_HEADERS });
 }
 
-export interface AdminEnv {
-  BMUSEUM_ADMIN_TOKEN: string;
-  BMUSEUM_KV?: unknown;
-  GITHUB_TOKEN?: string;
-}
-
 /** 校验 Bearer Token，失败绝不动 KV。 */
-export function isAuthed(env: AdminEnv, request: Request): boolean {
+export function isAuthed(env, request) {
   const auth = request.headers.get('Authorization');
   if (!auth || !auth.startsWith('Bearer ')) return false;
   const provided = auth.slice('Bearer '.length).trim();
@@ -29,7 +23,7 @@ export function isAuthed(env: AdminEnv, request: Request): boolean {
 }
 
 /** 由标题/名称生成 kebab slug（保留字母数字与中文）。 */
-export function slugify(input: string): string {
+export function slugify(input) {
   return input
     .trim()
     .toLowerCase()
@@ -38,7 +32,7 @@ export function slugify(input: string): string {
 }
 
 /** 防止 slug 重复：已存在则追加 -2 / -3 … */
-export function ensureUniqueSlug(slug: string, taken: Set<string>): string {
+export function ensureUniqueSlug(slug, taken) {
   if (!taken.has(slug)) return slug;
   let i = 2;
   while (taken.has(`${slug}-${i}`)) i++;
@@ -50,12 +44,7 @@ export function ensureUniqueSlug(slug: string, taken: Set<string>): string {
  * 种子文件由 scripts/copy-seed.mjs 在构建前生成到 public/seed/。
  * 获取失败不影响运行：KV 保持空，前端会回落到打包 JSON。
  */
-export async function ensureSeeded(
-  kv: { get: (k: string) => Promise<string | null>; put: (k: string, v: string) => Promise<void> },
-  request: Request,
-  key: string,
-  seedPath: string,
-): Promise<void> {
+export async function ensureSeeded(kv, request, key, seedPath) {
   const existing = await kv.get(key);
   if (existing) return;
   try {
@@ -65,6 +54,6 @@ export async function ensureSeeded(
     const text = await res.text();
     await kv.put(key, text);
   } catch {
-    /* 种子不可用：保持空，前端回落打包 JSON */
+    /* 种子不可用：保持空，前端回落到打包 JSON */
   }
 }

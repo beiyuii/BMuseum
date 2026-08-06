@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { onRequestPost, onRequestOptions } from './sync';
+import { onRequestPost, onRequestOptions } from '../../../../functions/api/admin/projects/sync.js';
 import { makeMockEnv, resetKV } from '../../../../tests/helpers/mockEnv';
 
 const ADMIN_TOKEN = 'test-admin-token-123';

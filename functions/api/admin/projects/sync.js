@@ -4,29 +4,10 @@
  * Bearer Token 鉴权。返回 { synced: number }。
  */
 
-import { CORS_HEADERS, json, isAuthed } from '../../_lib/helpers';
+import { CORS_HEADERS, json, isAuthed } from '../../_lib/helpers.js';
 
-interface KVNamespace {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
-}
-interface Env {
-  BMUSEUM_KV: KVNamespace;
-  BMUSEUM_ADMIN_TOKEN: string;
-  GITHUB_TOKEN?: string;
-}
-interface Project {
-  slug: string;
-  source: { type: 'github'; repo: string } | { type: 'manual' };
-  auto: { version?: string; updated?: string; stars?: number };
-}
-interface ProjectsData {
-  synced_at: string;
-  projects: Project[];
-}
-
-async function gh(path: string, token?: string): Promise<any | null> {
-  const headers: Record<string, string> = {
+async function gh(path, token) {
+  const headers = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'bmuseum-sync',
   };
@@ -37,18 +18,18 @@ async function gh(path: string, token?: string): Promise<any | null> {
   return res.json();
 }
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
 
-export async function onRequestPost(context: { env: Env; request: Request }): Promise<Response> {
+export async function onRequestPost(context) {
   if (!isAuthed(context.env, context.request)) return json({ error: 'unauthorized' }, 401);
 
   const kv = context.env.BMUSEUM_KV;
   const raw = await kv.get('projects');
   if (!raw) return json({ synced: 0 });
 
-  const data = JSON.parse(raw) as ProjectsData;
+  const data = JSON.parse(raw);
   let count = 0;
 
   for (const p of data.projects) {

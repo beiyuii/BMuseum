@@ -10,63 +10,37 @@
  * 与旧版隔离键 articles:user 不再使用。
  */
 
-import { CORS_HEADERS, json, isAuthed, slugify, ensureUniqueSlug } from '../../_lib/helpers';
-
-interface KVNamespace {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
-}
-interface Env {
-  BMUSEUM_KV: KVNamespace;
-  BMUSEUM_ADMIN_TOKEN: string;
-}
-interface Article {
-  slug: string;
-  wing: string;
-  no: number;
-  title: string;
-  subtitle?: string;
-  summary: string;
-  body: string;
-  created: string;
-  updated: string;
-  version: string;
-  featured: boolean;
-  tags: string[];
-  cover?: string;
-  reading_time_min: number;
-  status?: string;
-}
+import { CORS_HEADERS, json, isAuthed, slugify, ensureUniqueSlug } from '../../_lib/helpers.js';
 
 const MAX_ARTICLES = 1000;
 const DEFAULT_VERSION = 'v1.0';
 
-async function loadAll(kv: KVNamespace): Promise<Article[]> {
+async function loadAll(kv) {
   const raw = await kv.get('articles');
-  return raw ? (JSON.parse(raw) as Article[]) : [];
+  return raw ? JSON.parse(raw) : [];
 }
-async function saveAll(kv: KVNamespace, arr: Article[]): Promise<void> {
+async function saveAll(kv, arr) {
   await kv.put('articles', JSON.stringify(arr));
 }
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
 
 /** GET — 后台列出全部文章 */
-export async function onRequestGet(context: { env: Env; request: Request }): Promise<Response> {
+export async function onRequestGet(context) {
   if (!isAuthed(context.env, context.request)) return json({ error: 'unauthorized' }, 401);
   const all = await loadAll(context.env.BMUSEUM_KV);
   return json(all);
 }
 
 /** POST — 新建文章 */
-export async function onRequestPost(context: { env: Env; request: Request }): Promise<Response> {
+export async function onRequestPost(context) {
   if (!isAuthed(context.env, context.request)) return json({ error: 'unauthorized' }, 401);
 
-  let body: Record<string, unknown> | null;
+  let body;
   try {
-    body = (await context.request.json()) as Record<string, unknown>;
+    body = await context.request.json();
   } catch {
     return json({ error: 'invalid_json' }, 400);
   }
@@ -91,7 +65,7 @@ export async function onRequestPost(context: { env: Env; request: Request }): Pr
   const no = typeof body.no === 'number' && body.no > 0 ? body.no : maxNo + 1;
   const now = new Date().toISOString();
 
-  const article: Article = {
+  const article = {
     slug,
     wing,
     no,
@@ -103,7 +77,7 @@ export async function onRequestPost(context: { env: Env; request: Request }): Pr
     updated: now,
     version: typeof body.version === 'string' ? body.version : DEFAULT_VERSION,
     featured: body.featured === true,
-    tags: Array.isArray(body.tags) ? (body.tags as string[]) : [],
+    tags: Array.isArray(body.tags) ? body.tags : [],
     cover: typeof body.cover === 'string' ? body.cover : undefined,
     reading_time_min: typeof body.reading_time_min === 'number' ? body.reading_time_min : 0,
     status: typeof body.status === 'string' ? body.status : 'on_display',
@@ -116,12 +90,12 @@ export async function onRequestPost(context: { env: Env; request: Request }): Pr
 }
 
 /** PUT — 按 body.slug 更新文章（slug 与 created 不可改） */
-export async function onRequestPut(context: { env: Env; request: Request }): Promise<Response> {
+export async function onRequestPut(context) {
   if (!isAuthed(context.env, context.request)) return json({ error: 'unauthorized' }, 401);
 
-  let body: Record<string, unknown> | null;
+  let body;
   try {
-    body = (await context.request.json()) as Record<string, unknown>;
+    body = await context.request.json();
   } catch {
     return json({ error: 'invalid_json' }, 400);
   }
@@ -131,17 +105,17 @@ export async function onRequestPut(context: { env: Env; request: Request }): Pro
 
   const kv = context.env.BMUSEUM_KV;
   const all = await loadAll(kv);
-  const idx = all.findIndex((a) => a.slug === body!.slug);
+  const idx = all.findIndex((a) => a.slug === body.slug);
   if (idx < 0) return json({ error: 'not_found' }, 404);
 
   const prev = all[idx];
-  const updated: Article = {
+  const updated = {
     ...prev,
-    ...(body as object),
+    ...body,
     slug: prev.slug,
     created: prev.created,
     updated: new Date().toISOString(),
-  } as Article;
+  };
 
   all[idx] = updated;
   await saveAll(kv, all);
@@ -149,7 +123,7 @@ export async function onRequestPut(context: { env: Env; request: Request }): Pro
 }
 
 /** DELETE — 按 ?slug= 删除 */
-export async function onRequestDelete(context: { env: Env; request: Request }): Promise<Response> {
+export async function onRequestDelete(context) {
   if (!isAuthed(context.env, context.request)) return json({ error: 'unauthorized' }, 401);
 
   const slug = new URL(context.request.url).searchParams.get('slug');

@@ -9,66 +9,34 @@
  *   projects → { synced_at: string, projects: Project[] }
  */
 
-import { CORS_HEADERS, json, isAuthed, slugify, ensureUniqueSlug } from '../../_lib/helpers';
+import { CORS_HEADERS, json, isAuthed, slugify, ensureUniqueSlug } from '../../_lib/helpers.js';
 
-interface KVNamespace {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
-}
-interface Env {
-  BMUSEUM_KV: KVNamespace;
-  BMUSEUM_ADMIN_TOKEN: string;
-}
-interface ProjectLink {
-  label: string;
-  url: string;
-}
-interface Project {
-  slug: string;
-  name: string;
-  name_en?: string;
-  tagline: string;
-  status: string;
-  status_label: string;
-  platform: string;
-  tech: string[];
-  accent: string;
-  links: ProjectLink[];
-  article_slug?: string;
-  source: { type: 'github'; repo: string } | { type: 'manual' };
-  auto: { version?: string; updated?: string; stars?: number };
-}
-interface ProjectsData {
-  synced_at: string;
-  projects: Project[];
-}
-
-async function loadData(kv: KVNamespace): Promise<ProjectsData> {
+async function loadData(kv) {
   const raw = await kv.get('projects');
-  return raw ? (JSON.parse(raw) as ProjectsData) : { synced_at: '', projects: [] };
+  return raw ? JSON.parse(raw) : { synced_at: '', projects: [] };
 }
-async function saveData(kv: KVNamespace, data: ProjectsData): Promise<void> {
+async function saveData(kv, data) {
   await kv.put('projects', JSON.stringify(data));
 }
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
 
 /** GET — 列出全部项目 */
-export async function onRequestGet(context: { env: Env; request: Request }): Promise<Response> {
+export async function onRequestGet(context) {
   if (!isAuthed(context.env, context.request)) return json({ error: 'unauthorized' }, 401);
   const data = await loadData(context.env.BMUSEUM_KV);
   return json(data);
 }
 
 /** POST — 新建项目 */
-export async function onRequestPost(context: { env: Env; request: Request }): Promise<Response> {
+export async function onRequestPost(context) {
   if (!isAuthed(context.env, context.request)) return json({ error: 'unauthorized' }, 401);
 
-  let body: Record<string, unknown> | null;
+  let body;
   try {
-    body = (await context.request.json()) as Record<string, unknown>;
+    body = await context.request.json();
   } catch {
     return json({ error: 'invalid_json' }, 400);
   }
@@ -90,7 +58,7 @@ export async function onRequestPost(context: { env: Env; request: Request }): Pr
     taken,
   );
 
-  const project: Project = {
+  const project = {
     slug,
     name,
     name_en: typeof body.name_en === 'string' ? body.name_en : undefined,
@@ -98,15 +66,15 @@ export async function onRequestPost(context: { env: Env; request: Request }): Pr
     status: typeof body.status === 'string' ? body.status : 'running',
     status_label: typeof body.status_label === 'string' ? body.status_label : '进行中',
     platform: typeof body.platform === 'string' ? body.platform : '',
-    tech: Array.isArray(body.tech) ? (body.tech as string[]) : [],
+    tech: Array.isArray(body.tech) ? body.tech : [],
     accent: typeof body.accent === 'string' ? body.accent : '#C15F3C',
-    links: Array.isArray(body.links) ? (body.links as ProjectLink[]) : [],
+    links: Array.isArray(body.links) ? body.links : [],
     article_slug: typeof body.article_slug === 'string' ? body.article_slug : undefined,
     source:
-      body.source && (body.source as { type: string }).type === 'github'
-        ? { type: 'github', repo: (body.source as { repo: string }).repo ?? '' }
+      body.source && body.source.type === 'github'
+        ? { type: 'github', repo: body.source.repo ?? '' }
         : { type: 'manual' },
-    auto: typeof body.auto === 'object' && body.auto ? (body.auto as Project['auto']) : {},
+    auto: typeof body.auto === 'object' && body.auto ? body.auto : {},
   };
 
   data.projects.unshift(project);
@@ -116,12 +84,12 @@ export async function onRequestPost(context: { env: Env; request: Request }): Pr
 }
 
 /** PUT — 按 body.slug 更新（slug 不可改，auto 做浅合并） */
-export async function onRequestPut(context: { env: Env; request: Request }): Promise<Response> {
+export async function onRequestPut(context) {
   if (!isAuthed(context.env, context.request)) return json({ error: 'unauthorized' }, 401);
 
-  let body: Record<string, unknown> | null;
+  let body;
   try {
-    body = (await context.request.json()) as Record<string, unknown>;
+    body = await context.request.json();
   } catch {
     return json({ error: 'invalid_json' }, 400);
   }
@@ -131,16 +99,16 @@ export async function onRequestPut(context: { env: Env; request: Request }): Pro
 
   const kv = context.env.BMUSEUM_KV;
   const data = await loadData(kv);
-  const idx = data.projects.findIndex((p) => p.slug === body!.slug);
+  const idx = data.projects.findIndex((p) => p.slug === body.slug);
   if (idx < 0) return json({ error: 'not_found' }, 404);
 
   const prev = data.projects[idx];
-  const updated: Project = {
+  const updated = {
     ...prev,
-    ...(body as object),
+    ...body,
     slug: prev.slug,
     auto: { ...prev.auto, ...(typeof body.auto === 'object' && body.auto ? body.auto : {}) },
-  } as Project;
+  };
 
   data.projects[idx] = updated;
   data.synced_at = new Date().toISOString().slice(0, 10);
@@ -149,7 +117,7 @@ export async function onRequestPut(context: { env: Env; request: Request }): Pro
 }
 
 /** DELETE — 按 ?slug= 删除 */
-export async function onRequestDelete(context: { env: Env; request: Request }): Promise<Response> {
+export async function onRequestDelete(context) {
   if (!isAuthed(context.env, context.request)) return json({ error: 'unauthorized' }, 401);
 
   const slug = new URL(context.request.url).searchParams.get('slug');

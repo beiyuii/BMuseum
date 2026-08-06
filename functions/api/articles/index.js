@@ -5,32 +5,21 @@
  * 按 no 倒序。公众站再按 on_display 过滤出真正展出的。
  */
 
-import { CORS_HEADERS, json, ensureSeeded } from '../_lib/helpers';
+import { CORS_HEADERS, json, ensureSeeded } from '../_lib/helpers.js';
 
-interface KVNamespace {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
-}
-interface Env {
-  BMUSEUM_KV: KVNamespace;
-}
-
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
 
-export async function onRequestGet(context: {
-  env: Env;
-  request: Request;
-}): Promise<Response> {
+export async function onRequestGet(context) {
   const kv = context.env.BMUSEUM_KV;
   await ensureSeeded(kv, context.request, 'articles', '/seed/articles.json');
 
   const raw = await kv.get('articles');
-  const all = raw ? (JSON.parse(raw) as Record<string, unknown>[]) : [];
+  const all = raw ? JSON.parse(raw) : [];
   const visible = all
     .filter((a) => (a.status ?? 'on_display') !== 'draft')
-    .sort((a, b) => ((b.no as number) ?? 0) - ((a.no as number) ?? 0));
+    .sort((a, b) => (b.no ?? 0) - (a.no ?? 0));
 
   return json(visible);
 }

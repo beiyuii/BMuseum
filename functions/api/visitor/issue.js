@@ -9,15 +9,6 @@
  *   counter:visitors  →  "1234"  （当前最大票号）
  */
 
-interface Env {
-  BMUSEUM_KV: KVNamespace;
-}
-
-interface KVNamespace {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
-}
-
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -25,11 +16,11 @@ const CORS_HEADERS = {
   'Content-Type': 'application/json',
 };
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
 
-export async function onRequestPost(context: { env: Env }): Promise<Response> {
+export async function onRequestPost(context) {
   try {
     const kv = context.env.BMUSEUM_KV;
 

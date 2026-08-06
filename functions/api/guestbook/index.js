@@ -12,30 +12,6 @@
  *   ratelimit:{ipHash}  →  "3"   （TTL 3600s，剩余次数）
  */
 
-interface Env {
-  BMUSEUM_KV: KVNamespace;
-}
-
-interface KVNamespace {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
-}
-
-interface GuestEntry {
-  id: string;
-  name: string;
-  message: string;
-  created: string;
-  status: 'pending' | 'published' | 'blocked';
-  ip_hash: string;
-}
-
-interface SubmitBody {
-  name: string;
-  message: string;
-  website?: string; // honeypot — must be empty
-}
-
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -58,11 +34,11 @@ const MAX_ENTRIES = 200;    // KV 最多保存 200 条留言
 
 /* ── Helpers ── */
 
-function generateId(): string {
+function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-async function hashIp(ip: string): Promise<string> {
+async function hashIp(ip) {
   const data = new TextEncoder().encode(ip + 'bmuseum_salt_2026');
   const buf = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(buf))
@@ -71,29 +47,26 @@ async function hashIp(ip: string): Promise<string> {
     .join('');
 }
 
-function containsBlockedWord(text: string): boolean {
+function containsBlockedWord(text) {
   const lower = text.toLowerCase();
   return BLOCKED_WORDS.some((w) => lower.includes(w));
 }
 
-function json(body: unknown, status = 200): Response {
+function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: CORS_HEADERS });
 }
 
 /* ── Handlers ── */
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
 
 /** GET /api/guestbook — 返回已发布留言 */
-export async function onRequestGet(context: {
-  env: Env;
-  request: Request;
-}): Promise<Response> {
+export async function onRequestGet(context) {
   try {
     const raw = await context.env.BMUSEUM_KV.get('guestbook:entries');
-    const entries: GuestEntry[] = raw ? (JSON.parse(raw) as GuestEntry[]) : [];
+    const entries = raw ? JSON.parse(raw) : [];
     const published = entries
       .filter((e) => e.status === 'published')
       .sort((a, b) => b.created.localeCompare(a.created))
@@ -105,17 +78,14 @@ export async function onRequestGet(context: {
 }
 
 /** POST /api/guestbook — 提交新留言 */
-export async function onRequestPost(context: {
-  env: Env;
-  request: Request;
-}): Promise<Response> {
+export async function onRequestPost(context) {
   const kv = context.env.BMUSEUM_KV;
   const req = context.request;
 
   /* ── 解析 body ── */
-  let body: SubmitBody;
+  let body;
   try {
-    body = (await req.json()) as SubmitBody;
+    body = await req.json();
   } catch {
     return json({ ok: false, error: 'invalid_json' }, 400);
   }
@@ -156,7 +126,7 @@ export async function onRequestPost(context: {
   }
 
   /* ── 写入留言 ── */
-  const entry: GuestEntry = {
+  const entry = {
     id: generateId(),
     name,
     message,
@@ -167,7 +137,7 @@ export async function onRequestPost(context: {
 
   try {
     const raw = await kv.get('guestbook:entries');
-    const entries: GuestEntry[] = raw ? (JSON.parse(raw) as GuestEntry[]) : [];
+    const entries = raw ? JSON.parse(raw) : [];
 
     entries.unshift(entry);
 
