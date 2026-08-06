@@ -1,10 +1,10 @@
 /**
- * POST /api/admin/projects/sync — 后台手动触发「从 GitHub 重新同步」。
+ * POST /api/admin/sync — 后台手动触发「从 GitHub 重新同步」。
  * 对 source.type === 'github' 的项目拉 GitHub API，回写 auto.version / updated / stars。
  * Bearer Token 鉴权。返回 { synced: number }。
  */
 
-import { CORS_HEADERS, json, isAuthed } from '../../_lib/helpers.js';
+import { CORS_HEADERS, json, isAuthed } from '../_lib/helpers';
 
 async function gh(path, token) {
   const headers = {

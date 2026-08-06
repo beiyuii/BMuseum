@@ -5,7 +5,7 @@ import {
   onRequestPut,
   onRequestDelete,
   onRequestOptions,
-} from '../../../../functions/api/admin/projects/index.js';
+} from '../../../../functions/api/admin/projects';
 import { makeMockEnv, resetKV } from '../../../../tests/helpers/mockEnv';
 
 const ADMIN_TOKEN = 'test-admin-token-123';

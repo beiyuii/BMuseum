@@ -10,7 +10,7 @@
  * 与旧版隔离键 articles:user 不再使用。
  */
 
-import { CORS_HEADERS, json, isAuthed, slugify, ensureUniqueSlug } from '../../_lib/helpers.js';
+import { CORS_HEADERS, json, isAuthed, slugify, ensureUniqueSlug } from '../_lib/helpers';
 
 const MAX_ARTICLES = 1000;
 const DEFAULT_VERSION = 'v1.0';

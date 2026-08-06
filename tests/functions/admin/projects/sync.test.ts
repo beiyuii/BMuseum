@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { onRequestPost, onRequestOptions } from '../../../../functions/api/admin/projects/sync.js';
+import { onRequestPost, onRequestOptions } from '../../../../functions/api/admin/sync';
 import { makeMockEnv, resetKV } from '../../../../tests/helpers/mockEnv';
 
 const ADMIN_TOKEN = 'test-admin-token-123';
@@ -7,7 +7,7 @@ const ADMIN_TOKEN = 'test-admin-token-123';
 function makeRequest(auth?: string): Request {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (auth) headers['Authorization'] = auth;
-  return new Request('http://localhost/api/admin/projects/sync', { method: 'POST', headers });
+  return new Request('http://localhost/api/admin/sync', { method: 'POST', headers });
 }
 const auth = () => `Bearer ${ADMIN_TOKEN}`;
 
@@ -27,7 +27,7 @@ function mockGithub(repo: string, stars: number, version: string) {
   };
 }
 
-describe('admin/projects/sync — 鉴权与同步', () => {
+describe('admin/sync — 鉴权与同步', () => {
   beforeEach(() => resetKV());
 
   it('① 无 token → 401；OPTIONS → 204', async () => {

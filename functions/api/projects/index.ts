@@ -3,7 +3,7 @@
  * KV 为空时从 /seed/projects.json 播种。返回 { synced_at, projects }。
  */
 
-import { CORS_HEADERS, json, ensureSeeded } from '../_lib/helpers.js';
+import { CORS_HEADERS, json, ensureSeeded } from '../_lib/helpers';
 
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });

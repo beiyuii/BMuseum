@@ -9,7 +9,7 @@
  *   projects → { synced_at: string, projects: Project[] }
  */
 
-import { CORS_HEADERS, json, isAuthed, slugify, ensureUniqueSlug } from '../../_lib/helpers.js';
+import { CORS_HEADERS, json, isAuthed, slugify, ensureUniqueSlug } from '../_lib/helpers';
 
 async function loadData(kv) {
   const raw = await kv.get('projects');

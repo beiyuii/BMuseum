@@ -226,7 +226,7 @@ export default function Admin() {
     setSyncing(true);
     setSyncMsg('');
     try {
-      const res = await fetch('/api/admin/projects/sync', authHeaders('POST') as RequestInit & { headers: Record<string, string> });
+      const res = await fetch('/api/admin/sync', authHeaders('POST') as RequestInit & { headers: Record<string, string> });
       const data = await res.json();
       setSyncMsg(res.ok ? `已同步 ${data.synced ?? 0} 个项目` : '同步失败');
       if (res.ok) { await reload(); refresh(); }

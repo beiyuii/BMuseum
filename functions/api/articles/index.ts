@@ -5,7 +5,7 @@
  * 按 no 倒序。公众站再按 on_display 过滤出真正展出的。
  */
 
-import { CORS_HEADERS, json, ensureSeeded } from '../_lib/helpers.js';
+import { CORS_HEADERS, json, ensureSeeded } from '../_lib/helpers';
 
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
