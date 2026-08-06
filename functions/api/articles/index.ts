@@ -1,0 +1,36 @@
+/**
+ * GET /api/articles — 公开读取展出中的文章（供公众站）。
+ * KV 为空时从 /seed/articles.json 播种。
+ * 返回 status !== 'draft' 的文章（on_display + storage，后者用于撤展提示页），
+ * 按 no 倒序。公众站再按 on_display 过滤出真正展出的。
+ */
+
+import { CORS_HEADERS, json, ensureSeeded } from '../_lib/helpers';
+
+interface KVNamespace {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+}
+interface Env {
+  BMUSEUM_KV: KVNamespace;
+}
+
+export async function onRequestOptions(): Promise<Response> {
+  return new Response(null, { status: 204, headers: CORS_HEADERS });
+}
+
+export async function onRequestGet(context: {
+  env: Env;
+  request: Request;
+}): Promise<Response> {
+  const kv = context.env.BMUSEUM_KV;
+  await ensureSeeded(kv, context.request, 'articles', '/seed/articles.json');
+
+  const raw = await kv.get('articles');
+  const all = raw ? (JSON.parse(raw) as Record<string, unknown>[]) : [];
+  const visible = all
+    .filter((a) => (a.status ?? 'on_display') !== 'draft')
+    .sort((a, b) => ((b.no as number) ?? 0) - ((a.no as number) ?? 0));
+
+  return json(visible);
+}

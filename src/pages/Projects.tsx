@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { articles, projects, projectsSyncedAt } from '../data/content';
 import type { Project, ProjectStatus } from '../types';
+import { useMuseumData } from '../data/MuseumDataContext';
 import { useReveal } from '../hooks/useReveal';
 import './Projects.css';
 
@@ -18,11 +18,11 @@ const STATUS_LABELS: Record<ProjectStatus, string> = {
 
 const INACTIVE_STATUSES: ProjectStatus[] = ['paused', 'archived'];
 
-function articleExists(slug?: string): boolean {
-  return !!slug && articles.some((a) => a.slug === slug);
+function articleExists(slug?: string, list: { slug: string }[] = []): boolean {
+  return !!slug && list.some((a) => a.slug === slug);
 }
 
-function ProjectCard({ project }: { project: Project }) {
+function ProjectCard({ project, articles }: { project: Project; articles: { slug: string }[] }) {
   const inactive = INACTIVE_STATUSES.includes(project.status);
   const accent = inactive ? 'var(--ink-faint)' : project.accent;
   const isGithub = project.source.type === 'github';
@@ -72,7 +72,7 @@ function ProjectCard({ project }: { project: Project }) {
             {link.label} ↗
           </a>
         ))}
-        {articleExists(project.article_slug) && (
+        {articleExists(project.article_slug, articles) && (
           <Link to={`/article/${project.article_slug}`} className="project-card-story">
             背后的思考 →
           </Link>
@@ -85,14 +85,25 @@ function ProjectCard({ project }: { project: Project }) {
 export default function Projects() {
   const [filter, setFilter] = useState<Filter>('all');
   const revealRef = useReveal();
+  const { articles, projects, projectsSyncedAt, loading } = useMuseumData();
 
   const counts = useMemo(() => {
     const c = new Map<ProjectStatus, number>();
     projects.forEach((p) => c.set(p.status, (c.get(p.status) ?? 0) + 1));
     return c;
-  }, []);
+  }, [projects]);
 
   const shown = filter === 'all' ? projects : projects.filter((p) => p.status === filter);
+
+  if (loading) {
+    return (
+      <main className="projects-page">
+        <div className="container">
+          <div className="loading">策展中…</div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="projects-page">
@@ -126,7 +137,7 @@ export default function Projects() {
 
         <div className="projects-list reveal" ref={revealRef as React.Ref<HTMLDivElement>}>
           {shown.map((p) => (
-            <ProjectCard key={p.slug} project={p} />
+            <ProjectCard key={p.slug} project={p} articles={articles} />
           ))}
         </div>
 

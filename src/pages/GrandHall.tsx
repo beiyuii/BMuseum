@@ -2,7 +2,8 @@ import { useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollProgress } from '../hooks/useScrollProgress';
 import { useReveal } from '../hooks/useReveal';
-import { articles, wings, socials, latestProjectUpdates } from '../data/content';
+import { wings, socials, latestProjectUpdates } from '../data/content';
+import { useMuseumData } from '../data/MuseumDataContext';
 import './GrandHall.css';
 
 interface GrandHallProps {
@@ -14,8 +15,9 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
   const progress = useScrollProgress(thresholdRef);
   const hallRevealRef = useReveal();
   const lastDarkRef = useRef(false);
+  const { articles, projects } = useMuseumData();
 
-  const nowItems = useMemo(() => latestProjectUpdates(2), []);
+  const nowItems = useMemo(() => latestProjectUpdates(projects, 2), [projects]);
 
   const skipToHall = () => {
     document.getElementById('hall')?.scrollIntoView({ behavior: 'smooth' });
@@ -63,7 +65,7 @@ export default function GrandHall({ onNavDarkChange }: GrandHallProps) {
       counts[a.wing] = (counts[a.wing] || 0) + 1;
     });
     return counts;
-  }, []);
+  }, [articles]);
 
   return (
     <main className="grand-hall">

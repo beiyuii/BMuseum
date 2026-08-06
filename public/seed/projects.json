@@ -1,0 +1,89 @@
+{
+  "synced_at": "2026-07-13",
+  "projects": [
+    {
+      "slug": "caiyi",
+      "name": "才驿",
+      "name_en": "Caiyi",
+      "tagline": "人才政策 AI 顾问——输入你的条件，直接告诉你能申请什么补贴、还差什么材料。",
+      "status": "running",
+      "status_label": "运行中",
+      "platform": "Web 应用",
+      "tech": [
+        "FastAPI",
+        "AI 顾问",
+        "腾讯云"
+      ],
+      "accent": "#7A8C5F",
+      "links": [
+        {
+          "label": "访问产品",
+          "url": "https://caiyi.linter.top/"
+        }
+      ],
+      "article_slug": "rencai",
+      "source": {
+        "type": "manual"
+      },
+      "auto": {
+        "version": "v2.1",
+        "updated": "2026-05-09"
+      }
+    },
+    {
+      "slug": "tuwen-factory",
+      "name": "图文故事工厂",
+      "name_en": "Story Factory",
+      "tagline": "AI 图文账号创作台——为图文账号小白生成多风格文案、分镜和生图提示词。",
+      "status": "running",
+      "status_label": "运行中",
+      "platform": "Web 应用",
+      "tech": [
+        "AI 创作",
+        "图文账号"
+      ],
+      "accent": "#C15F3C",
+      "links": [
+        {
+          "label": "访问产品",
+          "url": "https://tuwen.xinglibureau.top/"
+        }
+      ],
+      "source": {
+        "type": "manual"
+      },
+      "auto": {}
+    },
+    {
+      "slug": "personal-api-skill",
+      "name": "Personal API Skill",
+      "name_en": "personal-api-skill",
+      "tagline": "把 Obsidian vault 变成个人身份层——任何 AI Agent 三十秒内知道你是谁。",
+      "status": "running",
+      "status_label": "开源 · 维护中",
+      "platform": "GitHub",
+      "tech": [
+        "Obsidian",
+        "Agent Skill",
+        "Markdown 协议"
+      ],
+      "accent": "#5B7A9A",
+      "links": [
+        {
+          "label": "GitHub 仓库",
+          "url": "https://github.com/beiyuii/personal-api-skill"
+        }
+      ],
+      "article_slug": "personal-api-project",
+      "source": {
+        "type": "github",
+        "repo": "beiyuii/personal-api-skill"
+      },
+      "auto": {
+        "version": "v2.0.3",
+        "updated": "2026-05-15",
+        "stars": 61
+      }
+    }
+  ]
+}

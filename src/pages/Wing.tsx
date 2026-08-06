@@ -2,7 +2,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
 import type { Article } from '../types';
 import { useReveal } from '../hooks/useReveal';
-import { articles as allVisible, wings as wingsList } from '../data/content';
+import { wings as wingsList } from '../data/content';
+import { useMuseumData } from '../data/MuseumDataContext';
 import './Wing.css';
 
 const WING_NUMBERS: Record<string, string> = {
@@ -20,6 +21,7 @@ const WING_ACCENT_CLASSES: Record<string, string> = {
 export default function Wing() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { articles: allArticles, loading } = useMuseumData();
 
   const wing = useMemo(
     () => wingsList.find((w) => w.slug === slug),
@@ -28,10 +30,10 @@ export default function Wing() {
 
   const articles = useMemo(
     () =>
-      allVisible
+      allArticles
         .filter((a) => a.wing === slug)
         .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()),
-    [slug]
+    [allArticles, slug]
   );
 
   const featured = useMemo(
@@ -60,6 +62,14 @@ export default function Wing() {
   const revealB = useReveal();
   const revealC = useReveal();
   const revealD = useReveal();
+
+  if (loading) {
+    return (
+      <div className="wing wing--empty">
+        <p>策展中…</p>
+      </div>
+    );
+  }
 
   if (!wing || !slug) {
     return (

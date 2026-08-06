@@ -1,0 +1,381 @@
+[
+  {
+    "slug": "fastapi-migration",
+    "wing": "tech",
+    "no": 1,
+    "title": "FastAPI 迁移实录：为什么我把 NestJS 换掉了",
+    "subtitle": "rencai 后端重构的完整决策路径",
+    "summary": "2026 年 4 月，我把 rencai 的后端从 NestJS 全量迁移到 FastAPI。不是因为 NestJS 不好，而是因为 Python 生态在 AI 集成上的优势在我的产品里已经是压倒性的。这是一次蓄谋已久的迁移，整个过程三周，集成测试 21/21 通过。",
+    "body": "## 迁移的真正原因\n\nrencai 的核心是 AI 顾问模块——渐进式问卷、意图分类、LLM 流式输出、简历解析。这些东西放在 Python 生态里做，代码量比 TypeScript 少三分之一，测试更直接，和 LLM SDK 的集成也更自然。NestJS 没有错，只是不是最适合这个产品的技术栈。\n\n## 怎么迁的\n\n我保持了 API 接口完全不变。前端不知道后端换了语言，这是迁移的核心约束。整个过程分三个阶段：第一周技术验证（FastAPI + Pydantic 替代 NestJS + Zod，逻辑层 1:1 对照）；第二周重写六个核心模块（policy、advisor、resume、auth、feedback、user）；第三周在腾讯云 Lighthouse 跑集成测试，修掉 Docker 容器里 better-sqlite3 的 Linux 依赖问题。\n\n## 生产环境落地\n\n最终部署在腾讯云 Lighthouse（OpenCloudOS 9.4，2核 3.6G），Docker 容器化，Nginx 反向代理到 `rencai.api.linter.top`，Let's Encrypt 自动续期。旧的 NestJS 实例用 PM2 跑了三个月，2026-05-09 正式停止。集成测试 21/21 通过，迁移完成。\n\n## 回头看\n\n迁移之后代码量减少了约 35%。更重要的是，之后每次接入新的 AI 能力——不管是 Coze 简历解析还是 DeepSeek 流式输出——都快了很多。技术选型的成本不在切换那一刻，在之后每一天的开发效率里。",
+    "created": "2026-05-09",
+    "updated": "2026-05-09",
+    "version": "v1.0",
+    "featured": true,
+    "tags": [
+      "FastAPI",
+      "NestJS",
+      "架构决策",
+      "rencai"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
+  },
+  {
+    "slug": "multi-agent-collaboration",
+    "wing": "tech",
+    "no": 2,
+    "title": "三重协作模型：Claude 规划，Gemini 审查，Codex 执行",
+    "subtitle": "我在用的多 Agent 协作体系",
+    "summary": "Vibe Coding 是起点，不是终点。真正的 Agentic Engineering 需要设计 Agent 之间的分工、信任边界和反馈闭环。我目前在用的三重协作模型：Claude Code 负责规划和方案，Gemini 作为独立审查层，Codex 执行具体代码生成。",
+    "body": "## 为什么需要多 Agent\n\n单个 Agent 最大的问题是确认偏差——它会倾向于验证自己的方案，而不是挑战它。引入独立审查层的目的就是打破这个循环。Gemini 不知道 Claude 的完整规划上下文，它看到的是结构化的需求文档和方案摘要，这种信息隔离让它的审查更有效。\n\n## 三重分工\n\n**规划层（Claude Code）**：理解项目上下文、提出架构方案、输出结构化 PRD。这一层需要最多的上下文，适合长上下文、强推理的模型。\n\n**审查层（Gemini）**：独立评估方案的逻辑漏洞、安全风险、边界条件遗漏。3-5 轮讨论机制，把分歧显式化，而不是让它隐藏在代码里。\n\n**执行层（Codex）**：给定明确的技术规格，专注代码生成。这一层不需要太强的推理能力，需要的是编码能力和指令遵从。\n\n## 成本控制\n\n三层用了三个模型，成本会不会失控？不会，因为分工本身就是成本控制。规划层和审查层交互频繁，用的是对话 token；执行层处理的是明确任务，不需要多轮对话。整体 token 消耗比单 Agent 反复调试要低。\n\n## 这不是银弹\n\n这套体系在需求明确的工程任务上效果很好。对于探索性的问题或者高度依赖上下文判断的决策，它不适用——那些情况人类审查仍然不可替代。",
+    "created": "2026-04-28",
+    "updated": "2026-05-01",
+    "version": "v1.1",
+    "featured": true,
+    "tags": [
+      "Agent",
+      "多Agent协作",
+      "Claude",
+      "工程化"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
+  },
+  {
+    "slug": "memory-architecture",
+    "wing": "tech",
+    "no": 3,
+    "title": "记忆分叉：AI 系统里最被忽视的设计问题",
+    "subtitle": "从 Obsidian 分层到 MIRIX 六层架构的思考",
+    "summary": "AI 的记忆问题不是「记住了什么」，而是「什么时候用什么粒度的记忆」。我在设计个人 AI 协作系统时，把记忆分成了三个层级：实时会话、项目上下文、长期身份。这个框架后来发现和行业最新的 MIRIX、MemOS 架构高度一致。",
+    "body": "## 记忆分叉的概念\n\n当同一个 AI 在不同项目之间切换时，它需要「忘记」上一个项目的细节，但又要「记住」你这个人的工作方式。这两件事在架构上是冲突的——如果你让 AI 记住所有东西，上下文会爆炸；如果你每次都清空，它就像失忆的助理。记忆分叉是说：在某个节点，记忆应该按主题、按项目、按时效性分叉存储，而不是线性堆叠。\n\n## 我的三级架构\n\n**短期记忆**（环形缓冲区）：当前会话的临时上下文，会话结束即清除。\n\n**中期记忆**（向量数据库）：项目状态、Skill 元数据、操作日志，按需检索。\n\n**长期记忆**（知识图谱）：核心规则、身份档案、不变的领域知识，低频更新。\n\n这套分层在我的 Obsidian vault 里有直接映射：`ME.md` 是长期记忆核心，`00.context/now.md` 是工作记忆，`30.knowledge/` 是中期知识库。\n\n## 和行业前沿的对照\n\nMIRIX 把 AI 记忆分成六层：核心、情景、语义、程序、资源、知识库。MemOS 用三级存储区分明文记忆、激活记忆、参数记忆。我的框架相对简化，但核心逻辑是一致的——记忆需要按照「更新频率」和「检索粒度」来分层，而不是按照「重要性」来线性排序。\n\n## 还没想清楚的部分\n\n记忆的「衰减机制」怎么设计？不重要的短期记忆可以直接丢弃，但那些「曾经重要、现在可能过时」的中期记忆呢？我目前的做法是人工标记 `[DEPRECATED]`，但这显然不够自动化。这是我正在探索的问题之一。",
+    "created": "2026-04-15",
+    "updated": "2026-04-20",
+    "version": "v1.0",
+    "featured": false,
+    "tags": [
+      "记忆架构",
+      "AI",
+      "Agent",
+      "MIRIX"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
+  },
+  {
+    "slug": "cost-performance-balance",
+    "wing": "tech",
+    "no": 4,
+    "title": "经济图灵测试：不追最强，追最划算",
+    "subtitle": "我的 AI 模型选型方法论",
+    "summary": "不是每个任务都需要最强的模型。我把这个判断框架叫「经济图灵测试」：能用便宜模型解决的问题，绝对不上贵的——关键是准确判断任务复杂度的阈值在哪里。",
+    "body": "## 为什么要控制成本\n\n我是独立开发者，AI API 费用是真实的变动成本。在 rencai、Drift、Personal API 同时在跑的情况下，不做成本控制，月账单会失控。但更重要的是：成本控制逼迫你思考「这个任务真正需要什么能力」，而不是无脑堆最强模型。\n\n## 三层模型组合\n\n**规划层**：T2 级推理模型（深度思考、架构方案设计）。这里需要推理深度，不省钱。\n\n**执行层**：高编码能力的高效模型（代码生成、格式化任务）。任务明确，不需要复杂推理，可以用便宜的。\n\n**审查层**：适中成本的模型（代码审查、一致性检验，不需要首席大脑）。\n\n## 国产模型的实际可用性\n\nQwen3.6Plus 在中文理解、代码生成上的表现，在它的价位段里是第一梯队。GLM5.1 在特定场景（结构化输出、函数调用）下表现稳定。国产化不是口号，是真实可用的成本控制选项。\n\n## 一个实操原则\n\n每次引入新的 AI 调用，先评估三件事：输出是否有确定性格式（有 → 用便宜模型）；是否需要跨段落的深度推理（需要 → 上强模型）；单次调用频率（高频 → 成本乘数效应，必须控制）。不做这三步评估就直接用最贵的模型，是工程失职。",
+    "created": "2026-04-09",
+    "updated": "2026-04-22",
+    "version": "v1.0",
+    "featured": false,
+    "tags": [
+      "成本优化",
+      "模型选型",
+      "AI",
+      "工程化"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
+  },
+  {
+    "slug": "personal-api-engineering",
+    "wing": "tech",
+    "no": 5,
+    "title": "把 Obsidian 变成 API：上下文工程的个人实践",
+    "subtitle": "Personal API v2.0 的架构思路",
+    "summary": "每次向 AI 解释「我是谁」「我的项目状态是什么」，都是重复劳动。Personal API 的核心思路：把 Obsidian vault 结构化成一个任何 AI 都能读的「身份 API」，一次配置，多端复用。",
+    "body": "## 问题的起点\n\n我每天用 Claude、Codex、Cursor 处理不同任务。每次开新会话，都要花几百 token 解释背景：「我是 00 后全栈工程师，在做 rencai 人才政策小程序，后端是 FastAPI，部署在腾讯云……」这是纯粹的重复成本。\n\n## 解决方案：ME.md + AGENT.md\n\n`ME.md` 是身份契约文件——任何 AI 读完这一个文件，就能知道我是谁、我怎么思考、我不做什么。`AGENT.md` 是协作契约——定义 AI 跟我互动的方式和边界。两个文件加起来不到 2000 字，但覆盖了 90% 需要反复交代的上下文。\n\nv2.0 加入了 Knowledge Palace v2 脚手架：一键创建 `30.knowledge/` 下的九个知识房间（capture、intelligence、research、notes、frameworks、projects、outputs、archive、system），同时安装知识管理操作手册。新建 vault 从零配置到可用，五分钟以内。\n\n## Agent-agnostic 设计\n\nClaude Code、Codex、Cursor、ChatGPT、Gemini——它们都能读 Markdown。Personal API 不绑定任何特定平台，就是一套 Markdown 协议。这是设计的核心约束，也是它开源之后能被其他人复用的原因。\n\n## 开源情况\n\nawesome-hermes-agent PR #37 已合并（2026-04-21）。HermesHub PR #51 仍在 Open 状态，等待 reviewer 的 CI 反馈。这是我第一个真正被社区接受的开源贡献。",
+    "created": "2026-04-20",
+    "updated": "2026-05-09",
+    "version": "v2.0",
+    "featured": false,
+    "tags": [
+      "Obsidian",
+      "Personal API",
+      "上下文工程",
+      "开源"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
+  },
+  {
+    "slug": "docker-linux-pitfalls",
+    "wing": "tech",
+    "no": 6,
+    "title": "Mac 开发，Linux 部署：Docker 容器化踩坑记",
+    "subtitle": "rencai 生产环境的三个具体问题",
+    "summary": "本地 Mac 开发一切正常，Docker 部署到腾讯云 Lighthouse（OpenCloudOS 9.4）之后出了一堆问题。最典型的：better-sqlite3 的 native binding 架构不匹配、容器环境变量未继承、Nginx 对 SSE 的缓冲导致流式输出失效。把这些坑记下来。",
+    "body": "## 问题一：Native Binding 架构不匹配\n\nbetter-sqlite3 是 C++ native addon，在 Mac（arm64）上 `npm install` 编译的 binding，放到 Linux amd64 容器里直接报 `Cannot find module`。解决方案：在 Dockerfile 里加 `npm rebuild`，或者在部署机器上直接构建镜像而不是跨平台。我选择了后者——在腾讯云机器上直接 build，不跨平台。\n\n## 问题二：环境变量在容器里消失\n\nCoze 简历解析 workflow 需要 API key，本地通过 `.env` 文件注入，没问题。生产 Docker 部署时忘记在 `docker-compose.prod.yml` 的 `environment` 块里声明，结果 `process.env.COZE_API_KEY` 是 `undefined`，简历解析静默失败——不报错，只是返回空结果。这个 bug 找了一个多小时，因为异常处理把它吞掉了。教训：生产环境的 env 变量配置要在 CI 检查清单里，不能靠记忆。\n\n## 问题三：Nginx 缓冲导致 SSE 失效\n\nrencai AI 顾问用了流式输出（SSE），Nginx 默认配置下 SSE 会被缓冲，导致前端拿不到实时 token，用户体验变成「等很久然后一次性出来」。解决方案：在 Nginx location 块里加 `proxy_buffering off` 和响应头 `X-Accel-Buffering: no`。\n\n## 根本原因\n\n这三个问题的根源都是一样的：开发环境和生产环境的差异没有被显式声明。下次的改进：在本地用 `docker compose up` 跑完整集成测试，而不只是在生产上踩坑。",
+    "created": "2026-05-05",
+    "updated": "2026-05-09",
+    "version": "v1.0",
+    "featured": false,
+    "tags": [
+      "Docker",
+      "部署",
+      "腾讯云",
+      "踩坑"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
+  },
+  {
+    "slug": "service-as-software",
+    "wing": "think",
+    "no": 7,
+    "title": "服务即软件：从卖工具到卖结果",
+    "subtitle": "SaaS → SaS 的范式转移意味着什么",
+    "summary": "传统 SaaS 卖工具，客户买了还要自己学、自己操作、自己招人。Service-as-Software（SaS）的逻辑是：软件直接交付最终商业成果。这不是渐进式改进，是商业模式底层逻辑的切换——从「席位订阅」到「按结果付费」，市场天花板从 3000 亿美元扩大到 4-5 万亿美元。",
+    "body": "## 一个对比\n\n合同管理 SaaS：给你一个编辑器、一个存储系统、一个审批流，你自己的法务团队用它来起草合同。SaS 版本：直接给你一份无瑕疵的合同。前者卖工具，后者卖结果。对客户来说，他们真正需要的是「合同」，不是「合同管理软件」。\n\n## 从 Copilot 到 Autopilot\n\nCopilot（副驾驶）模式的天花板是传统软件市场——辅助人类工作，还是人在开车。Autopilot（自动驾驶）模式的天花板是白领知识劳动力市场——AI 替代整个工作流，人变成架构师和质检员。两个天花板相差了一个数量级。\n\n## 对 rencai 的影响\n\nrencai 现在是「人才政策查询工具」——给用户一个界面，让他们自己查、自己判断。SaS 逻辑下应该是：用户输入简历，AI 直接输出「你适合申请深圳人才绿卡，需要补这三个材料，预计通过率 78%」。从工具到结论，中间省掉的是用户自己理解政策的时间和认知负担。这是 rencai 下一阶段要解决的核心产品问题。\n\n## 按结果付费的挑战\n\nOutcome-based Pricing 最难的地方不是技术，是如何定义「结果」。「一份无瑕疵合同」好量化，「一次有效的人才政策分析」怎么量化？这个问题没有通用答案，需要在具体产品里找到可测量的代理指标。",
+    "created": "2026-04-13",
+    "updated": "2026-04-20",
+    "version": "v1.0",
+    "featured": true,
+    "tags": [
+      "SaaS",
+      "商业模式",
+      "AI",
+      "产品思考"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
+  },
+  {
+    "slug": "opc-three-stages",
+    "wing": "think",
+    "no": 8,
+    "title": "OPC 三阶段路线：从零到百万美元 ARR",
+    "subtitle": "一人公司不是偷懒，是杠杆率游戏",
+    "summary": "一人公司（OPC）的核心不是「一个人做所有事」，而是「一个人撬动 AI 杠杆，做相当于中型科技公司的工作量」。三个阶段：奠基期（用服务验证需求）→ 杠杆期（把服务产品化自动化）→ 优化期（飞轮驱动的系统化增长）。每个阶段都不能跳。",
+    "body": "## 为什么三个阶段不能跳\n\n很多独立开发者的错误是直接从零开始做 SaaS——构建一个宏大的产品，没有先验证市场需求。阶段一（奠基期）的本质是「用时间换市场洞察」：亲自为客户提供服务，深入他们的业务流程，找到那个「重复发生、愿意付费、具有标准化潜力」的痛点。跳过阶段一，就是在没有地图的情况下盖楼。\n\n## 我现在在哪个阶段\n\n诚实的评估：rencai 介于阶段一和阶段二之间。产品已经存在，技术链路已通，但收入没有稳定在 $10K/月以上。还没有完成阶段一的核心任务——深度理解用户真正愿意付费的场景。提审之后的投流测试是阶段一的关键验证节点。\n\n## 阶段二的关键动作\n\n识别可以「人工 → API」替换的流程，把服务费转成 MRR。在 rencai 里，这意味着：AI 顾问分析从「用户手动触发一次」变成「持续追踪政策变动、主动推送匹配提醒」。订阅逻辑在这里。\n\n## 阶段三我在关注的事\n\n内容飞轮：通过可传播的内容降低 CAC。八大数字员工矩阵：Trend Scout + PRD Agent + Growth Marketer 的组合，让产品迭代和内容分发都异步进行。时间分配目标：20% 代码 + 80% 增长，而不是现在的反过来。",
+    "created": "2026-04-13",
+    "updated": "2026-04-25",
+    "version": "v1.0",
+    "featured": false,
+    "tags": [
+      "OPC",
+      "一人公司",
+      "商业模式",
+      "增长"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
+  },
+  {
+    "slug": "second-brain-methodology",
+    "wing": "think",
+    "no": 9,
+    "title": "第二大脑不是笔记本",
+    "subtitle": "分层知识体系是为了让 AI 能读懂你",
+    "summary": "用过 Notion、Roam、Logseq。最后在 Obsidian 里稳定下来——不是因为功能最好，而是因为它逼迫你自己定义结构。我的知识体系分七层，核心设计原则：AI 读这个 vault，应该能理解我是谁、在做什么、怎么思考。",
+    "body": "## 大多数笔记系统的失败模式\n\n知识进去，但没有变成可用的认知。积累了几千条笔记，真正用到的不超过 5%。根本原因：输入流程和输出流程是断开的。记笔记的那个「我」和使用知识的那个「我」，使用的是完全不同的检索路径。\n\n## 我的分层设计\n\n**Layer 0（核心身份）**：`ME.md`，核心身份、原则、与 AI 互动的约定。\n\n**Layer 1（当前状态）**：`00.context/now.md`，当前重心、项目状态、近期里程碑。这是变化最快的文件。\n\n**Layer 2（深层档案）**：`10.identity/` + `20.skills/` + `30.knowledge/`，价值观、能力图谱、知识库。\n\n为什么这样分？因为 AI 应该按照「重要程度」加载上下文，而不是把所有东西平铺在一个文件里。Layer 0 必读，Layer 1 按需读，Layer 2 检索读。这套加载顺序参考了 MemOS 的激活记忆设计。\n\n## 混合架构的核心判断\n\n身份层（`10.identity/`）需要人工策展——这里的内容代表你对自己的判断，AI 不能替你写。知识层（`30.knowledge/`）可以引入自动化流水线——文献笔记、永久笔记、MOC 索引，这些可以让 AI 辅助整理。两层的自动化程度不一样，这是有意识的设计决策。",
+    "created": "2026-04-10",
+    "updated": "2026-04-28",
+    "version": "v1.1",
+    "featured": false,
+    "tags": [
+      "知识管理",
+      "第二大脑",
+      "Obsidian",
+      "PKM"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
+  },
+  {
+    "slug": "knowledge-versioning",
+    "wing": "think",
+    "no": 10,
+    "title": "版本控制不只是 Git：给认知加版本号",
+    "subtitle": "想法会迭代，但大多数笔记工具只记住最终版本",
+    "summary": "代码有 Git，认知没有。我们的想法在不断迭代，但传统笔记工具只保存当前状态。当你想回溯「三个月前我为什么做了这个决策」，发现历史已经不在了。我在 Obsidian 里实践的知识版本化方法，和版本控制思维有直接的对应关系。",
+    "body": "## 认知为什么需要版本控制\n\n我对「AI Agent 应该怎么设计记忆系统」这个问题的想法，在过去六个月里至少迭代了三次。如果每次更新想法都是直接覆盖旧内容，我就失去了「为什么改变」的上下文。这个上下文往往比结论本身更有价值——它记录了你遇到了什么新信息、出现了什么反例、有什么具体经历改变了你的判断。\n\n## 我的版本化实践\n\n每个重要概念的文档里，我加了 `updated` 字段记录最后修改时间。重大认知更新时，不是直接覆盖，而是在文件里保留「迭代历史」段落，记录版本和变更原因。废弃的判断标记为 `[DEPRECATED]` 而不是删除——它依然是我思考路径的一部分。\n\n这套规则和 Git 的设计哲学是一致的：commit 应该是有意义的快照，而不是随机存档。`git blame` 让你知道每一行代码是谁在什么时候基于什么原因写的。认知版本控制的目标是一样的：让你知道每一个结论是在什么条件下形成的。\n\n## 一个反直觉的地方\n\n保留废弃的版本，不是在浪费空间。废弃版本是你的「负样本库」——你在特定条件下认为对的事，后来被证明是错的，这个记录会让你更准确地判断「类似条件下的类似结论」是否可信。",
+    "created": "2026-04-10",
+    "updated": "2026-04-22",
+    "version": "v1.0",
+    "featured": false,
+    "tags": [
+      "版本控制",
+      "知识管理",
+      "认知",
+      "方法论"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
+  },
+  {
+    "slug": "open-questions-ai",
+    "wing": "think",
+    "no": 11,
+    "title": "未解问题：AI 如何真正懂我",
+    "subtitle": "这篇文章没有答案，只有问题",
+    "summary": "好的问题比答案更有价值。我正在探索的核心问题：AI 如何跨越「回答问题」和「真正理解我」之间的鸿沟？Personal API 是一次尝试，但还远远不够。把正在思考的东西写下来。",
+    "body": "## 问题本身\n\n当我说「我希望 AI 懂我」，我具体在说什么？\n\n第一层：知道我的身份背景（ME.md 可以解决）。第二层：知道我的项目状态和当前上下文（now.md 可以解决）。第三层：理解我的思维方式，能预测我会如何判断一个新问题。第四层：在我还没意识到的情况下，发现我认知体系里的矛盾和盲区。\n\n第三层和第四层，我还没有好的答案。\n\n## 当前的局限\n\nPersonal API 解决了上下文加载的问题，但没有解决「理解」的问题。AI 读完 ME.md，能按照我的风格格式化输出，能避开我不喜欢的表达方式，但它还不能真正「预测」我在一个新场景里会怎么判断。\n\n这里有一个本质问题：我自己对自己的了解也是不完整的。我的很多判断是直觉先行、逻辑后补的——如果我自己都没有把这些直觉显式化，AI 怎么学到？\n\n## 一个未完成的方向\n\n记忆分叉机制能帮助 AI 按项目隔离上下文，但它还没有办法让 AI「学到我」，只是「记住跟我相关的事」。两者的差距在于：前者是数据存储问题，后者是模型适应问题。在没有个性化微调的情况下，如何通过上下文工程逼近第三层的理解？这是我下一个想认真研究的方向。",
+    "created": "2026-04-10",
+    "updated": "2026-04-30",
+    "version": "v0.9",
+    "featured": false,
+    "tags": [
+      "AI",
+      "上下文工程",
+      "未解问题",
+      "思考"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
+  },
+  {
+    "slug": "rencai",
+    "wing": "create",
+    "no": 12,
+    "title": "rencai — 人才政策 AI 顾问小程序",
+    "subtitle": "从查询工具到渐进式 AI 顾问的产品演进",
+    "summary": "应届生和跨城市求职者，面对散落在政府网站和 PDF 文件里的上百条人才政策，根本没有时间和能力自己读完。rencai 的核心假设：把「政策 × 个人条件」的匹配从用户自己做变成 AI 帮你做。当前后端已完成 NestJS → FastAPI 迁移，生产环境部署，集成测试 21/21 通过，准备提审。",
+    "body": "## 为什么做这个\n\n我在帮朋友找深圳人才补贴的信息，发现官方文档散落在政府网站、公众号、PDF 文件里，互相矛盾，没有一个地方能给你一个「以你的条件，你能申请什么、需要准备什么」的直接答案。这个信息不对称是真实痛点，有解决方案，技术上可行。\n\n## 产品核心：渐进式 AI 顾问\n\n不是搜索引擎，是顾问式对话。用户通过问卷逐步描述自己的情况（学历、工作年限、城市偏好），系统在后台匹配政策库，AI 生成个性化分析报告——哪个城市对你更有利、具体补贴金额是多少、申请条件你还差什么。四类意图（找城市、对比政策、条件匹配、综合分析）+ quick 和 deep 两档分析深度，流式输出。\n\n## 关键技术决策记录\n\n后端从 NestJS 迁到 FastAPI（理由见 Tech 翼 #001）。AI 分析记录从 Redis 迁到 PostgreSQL 持久化——因为用户回看历史分析是核心场景，临时存储会导致数据丢失。Taro 4 跨端输出——一套代码同时出小程序和 H5，减少维护成本。HMAC-SHA256 自定义 JWT 替代标准库，以降低依赖体积。\n\n## 当前阶段和未解问题\n\n生产环境已就绪，等微信审核。商业化路径还不清晰——基础查询免费 + 高级分析付费是一个方向，但 CAC 和留存数据还没有。这是提审后最优先要验证的假设。",
+    "created": "2026-04-09",
+    "updated": "2026-05-09",
+    "version": "v2.1",
+    "featured": true,
+    "tags": [
+      "rencai",
+      "微信小程序",
+      "AI顾问",
+      "产品"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
+  },
+  {
+    "slug": "drift",
+    "wing": "create",
+    "no": 13,
+    "title": "Drift — 让情绪以自然的形状沉淀",
+    "subtitle": "不是情绪管理工具，是情绪空间",
+    "summary": "市场上所有情绪 App 的底层逻辑是「量化 + 建议」。Drift 的产品哲学完全相反：不管理情绪，不给建议，只是接住它、保存它、让它以自然意象的形态存在。照片 + 只言片语输入，Apple Vision + NL 情绪感知，Metal 渲染自然场景。iOS SwiftUI，本地优先，隐私优先。",
+    "body": "## 产品定位：空间，而非工具\n\n用户回来不是因为有新功能，而是因为自己的情绪地形在那里生长。三个月的情绪历史会形成只属于你的「情绪地形图」——某段时间的情绪密度、某个情绪的质地、某些反复出现的意象。这些东西不是数据，是记忆的质感。\n\n## 两个核心 Aha Moment\n\n第一个：「被感知的瞬间」——第一次看到自己的照片和文字被转化成一个活着的自然场景，「对，就是这个感觉」。这一刻不能是算法强加的解读，必须是用户自己觉得准确的映射。\n\n第二个：「被自己的历史吓到」——三个月后打开情绪地形图，看见那段时间的完整形状，以为消散的情绪全都在那里。\n\n## 双主题系统：不是深色模式\n\nApp 根据设备时间自动在「昼光模式」（06:00-18:00，暖米白 `#F2EDE6`）和「夜境模式」（18:00-06:00，深森林绿 `#0E1C15`）之间切换。2.5 秒渐变，像真实日落的光线变化。这不是 UI 设计决策，是产品理念的延伸：App 感知用户所处的时间与环境，用自己的气质来配合。\n\n## 当前状态\n\nMVP 已可在模拟器和真机上调试。完成了 P1 数据管道（拍照 → Vision → NL → EmotionVector）、双主题系统、中英文切换、Xcode 签名配置。Canvas 动态化已执行但审查有遗留项。求职阶段以「亮点项目」角色存在。",
+    "created": "2026-04-28",
+    "updated": "2026-05-09",
+    "version": "v0.8",
+    "featured": true,
+    "tags": [
+      "Drift",
+      "iOS",
+      "SwiftUI",
+      "情绪",
+      "产品"
+    ],
+    "reading_time_min": 7,
+    "status": "on_display"
+  },
+  {
+    "slug": "personal-api-project",
+    "wing": "create",
+    "no": 14,
+    "title": "Personal API — 开源 Obsidian AI 身份层",
+    "subtitle": "让任何 AI 都能读懂你的 Obsidian vault",
+    "summary": "Personal API 是一个开源项目，也是一个协议。核心假设：如果你能把个人知识库结构化成一套标准的 Markdown 协议，那么任何能读 Markdown 的 AI 工具——Claude、Codex、ChatGPT——都可以快速理解你是谁、在做什么、怎么思考。v2.0.0 现已开源。",
+    "body": "## 项目的起点\n\n每次开一个新的 AI 会话，前几百 token 都在「自我介绍」。这是可以消除的重复成本。如果 AI 能一次性读取我的身份档案，后续所有会话就可以直接跳过介绍阶段，进入真正的工作。\n\n## v2.0 做了什么\n\nv1.0 只有 ME.md 和 AGENT.md 两个模板——身份契约和协作契约。v2.0 加入了 Knowledge Palace v2 脚手架：`setup.sh` 一键创建九个知识房间，同时安装 methodology.md（知识管理操作手册）。新增 `--minimal` 模式，只要身份层不要完整知识库结构，对轻量用户更友好。\n\n## 开源推进\n\nawesome-hermes-agent PR #37 于 2026-04-21 合并，这是我第一个被社区接受的开源贡献。HermesHub PR #51 仍在 Open，等待 CI 通过。两个 PR 交叉引用，形成信号增强。\n\n## 边界和隐私\n\n公开仓库只包含模板和方法论，不包含我的真实身份数据。这条原则是硬约束——Personal API 提供的是「框架」，不是「填好的表格」。用户用自己的数据填充，这才是隐私优先设计的落地方式。",
+    "created": "2026-04-19",
+    "updated": "2026-05-09",
+    "version": "v2.0",
+    "featured": false,
+    "tags": [
+      "Personal API",
+      "开源",
+      "Obsidian",
+      "上下文工程"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
+  },
+  {
+    "slug": "gpu-compass-postmortem",
+    "wing": "create",
+    "no": 15,
+    "title": "GPU Compass 停工记录：商业模式完全不可行",
+    "subtitle": "为什么一个感觉正确的方向最终停了",
+    "summary": "2026-04-13，我停止了 GPU Compass 的开发。面向中国 AI 开发者的 GPU 算力比价聚合平台，聚合 AutoDL、恒源云等服务商的价格信息。在停工之前，技术链路是通的。但商业模式根本不可行。记录判断过程。",
+    "body": "## 产品的初始假设\n\nAI 开发者在不同云服务商之间比价是真实痛点——价格信息散落在各平台，没有统一视图。如果做一个聚合比价工具，通过流量变现（广告或跳转佣金）是自然的商业模式。\n\n## 哪里出了问题\n\n第一，目标用户的行为路径不对。真正频繁使用 GPU 的开发者，已经固定在一个或两个平台，不会每次都比价——他们优先考虑的是平台稳定性、数据持久化、工具生态，而不是每小时便宜五毛钱。\n\n第二，价格信息的更新成本极高。各平台的价格页面结构不标准，需要持续维护爬虫，但价格变化的频率不足以让用户每天回来查看。\n\n第三，变现路径太弱。广告收入依赖 DAU，但这个工具的使用频率天然很低。跳转佣金要求和云服务商谈合作，门槛远超一个 side project 的能力。\n\n## 教训\n\n感觉正确的方向不等于可行的商业模式。「存在痛点」只是必要条件，「用户愿意为解决方案付费且你能触达他们」才是充分条件。下次启动项目，先问三个问题：谁付钱？付多少？为什么不用竞品？",
+    "created": "2026-04-13",
+    "updated": "2026-04-14",
+    "version": "v1.0",
+    "featured": false,
+    "tags": [
+      "GPU Compass",
+      "停工复盘",
+      "商业模式",
+      "创业"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
+  },
+  {
+    "slug": "hermes-stock-predict",
+    "wing": "create",
+    "no": 16,
+    "title": "A 股 AI 预测系统：一次生产崩溃的复盘",
+    "subtitle": "非自研系统的边界在哪里",
+    "summary": "这个系统跑在 Hermes Agent 的 cron workflow 上，对 10 只 A 股科技股做 AI 预测信号，DeepSeek+Kimi ensemble，飞书自动推送。2026-04-23 首次生产崩溃：confidence 字段为 None 时格式化抛出 TypeError，当日信号未生成。记录这次崩溃和系统的定位边界。",
+    "body": "## 系统架构\n\n10 只股票池（科技股方向），每日收盘后触发预测任务：历史数据拉取 → DeepSeek 主模型分析 → Kimi 交叉验证 → ensemble 结果 → SQLite 持久化 → 飞书机器人推送。整个链路在 Hermes Agent Cron 上运行，不需要手动触发。\n\n## 崩溃的细节\n\n`daily_trade_signal.py` 第 135 行：`f\"{s['confidence']:.0%}\"`。当 `confidence` 字段为 `None` 时，Python 格式化直接抛 TypeError，整个脚本崩溃，科大讯飞（002230.SZ）的当日信号未生成。崩溃原因明确，修复简单（加 None 检查），但它暴露了一个更深的问题：我对这个系统的异常处理设计是不够的。\n\n## 这个系统的定位边界\n\n它是「非自研」的——核心预测模型是 DeepSeek 和 Kimi，不是我写的。我做的是 workflow 集成、数据管道、推送链路。在简历叙事上，这个项目不是「自研 AI 系统」，是「AI 工程化集成实践」。这个定位区别很重要，不能夸大。\n\n## 归档的理由\n\n求职阶段，这个系统维护成本高（每天跑、需要盯）但叙事价值不够核心（非自研）。2026-05-07 项目整顿时，降级为归档状态，不再投入新的开发资源。代码留着，偶尔还在跑。",
+    "created": "2026-04-23",
+    "updated": "2026-05-07",
+    "version": "v3.1",
+    "featured": false,
+    "tags": [
+      "A股",
+      "AI预测",
+      "Hermes",
+      "归档"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
+  },
+  {
+    "slug": "bmuseum-build",
+    "wing": "create",
+    "no": 17,
+    "title": "B.Museum：把个人作品站做成博物馆",
+    "subtitle": "为什么不是博客，是展览",
+    "summary": "B.Museum 是这个站点本身。作品不应该按时间线堆叠——每件作品都有自己的叙事、版本号和馆藏号，访客在展厅之间穿行，而不是向下滚动。这是一次关于「个人作品如何被展示」的主观判断，也是 WorkBuddy × EdgeOne Pages 比赛的参赛作品。",
+    "body": "## 博物馆 vs 博客的核心差异\n\n博客是流，按时间线展示；博物馆是空间，按主题和价值组织。在博客里，两年前的文章会被新文章推下去消失；在博物馆里，老作品不会因为「旧」而失去地位，只会因为「不重要」才被降级展示。这个逻辑差异，决定了整个站点的信息架构。\n\n## 设计语言：Path D · Warm Cinematic\n\n主色调暖奶油白 `#F0EEE6`，唯一暗区 `#1F1E1B`（Hall Preview / Footer），主强调色红土 `#C15F3C`。全站超轻 SVG 噪点纸质感（opacity 0.04）。核心动效是 Threshold 穿门效果：220vh sticky 容器，letterbox → 全屏的滚动展开。中文用 Noto Serif SC + LXGW WenKai 楷体，英文副标题用 Fraunces italic——做「温暖的、有质感的、非科技感」的视觉。\n\n## 技术选型\n\nReact 19 + TypeScript 6 + Vite 8 + React Router v7，部署在 Tencent EdgeOne Pages，边缘函数 + KV 存储处理留言簿和访客票号。这套技术栈没有什么特别新鲜的，但每一个选型都有明确的理由，不是跟风。\n\n## 这是一次完整的产品闭环\n\n从信息架构到 About 文案，从设计语言到部署配置，一个人完成全部。这是「技术 + 产品 + 运营」复合能力的一次具体实践——虽然规模很小，但逻辑是完整的。",
+    "created": "2026-05-01",
+    "updated": "2026-05-10",
+    "version": "v1.0",
+    "featured": true,
+    "tags": [
+      "B.Museum",
+      "产品",
+      "设计",
+      "EdgeOne"
+    ],
+    "reading_time_min": 5,
+    "status": "on_display"
+  },
+  {
+    "slug": "eight-agent-matrix",
+    "wing": "think",
+    "no": 18,
+    "title": "八大数字员工矩阵：异步超高杠杆的工作方式",
+    "subtitle": "睡前下达任务，清晨检查结果",
+    "summary": "一人公司实现百万 ARR 的技术路径：8 个核心 Agent 在不同环境异步协作——趋势侦察、PRD 撰写、MVP 构建、增长营销，覆盖产品开发的完整链路。人不消失，只是从执行者变成架构师和质检员。",
+    "body": "## 八个角色的分工\n\n这八个 Agent 覆盖了产品从发现到增长的完整链路：Trend Scout（趋势侦察，发现高增长低竞争市场空白）→ Strategic Ideation（创意具象化，结合优势输出产品概念）→ PRD Agent（需求文档，防止逻辑偏离）→ Local Coding Engineer（自动构建 MVP）→ Cloud Marketing Architect（GTM 策略）→ Roadmap Specialist（防功能蔓延）→ Market Researcher（CAC/LTV 建模）→ Growth Marketer（落地页、邮件序列、内容）。\n\n## 威力机制\n\n睡前下达 3 个高层次任务。夜间异步并行：Trend Scout 持续抓取 Reddit/HN，PRD Agent 更新需求文档，Coding Engineer 自动构建功能，Growth Marketer 生成社媒内容。清晨醒来：代码已重构，营销计划待审核，市场洞察已更新。人变成了「系统的架构师」，而不是「系统里的执行者」。\n\n## 我的实施节奏\n\n阶段一（当前）：先部署 PRD Agent + Local Coding Engineer + Growth Marketer 三个核心角色。rencai 已经在这个框架里运行，只是还没有完全自动化。阶段二：加入 Trend Scout 和 Strategic Ideation，把「发现机会」这个环节也 Agent 化。\n\n## 最大的挑战不是技术\n\n是信任。把「发现机会」交给 Agent，意味着你不再完全控制产品方向的输入。在早期，这个权力不能完全下放——市场洞察需要人的判断来校准，特别是在中国市场，Agent 对本土语境的理解还有明显的局限。",
+    "created": "2026-04-13",
+    "updated": "2026-04-25",
+    "version": "v1.0",
+    "featured": false,
+    "tags": [
+      "多Agent",
+      "OPC",
+      "自动化",
+      "增长"
+    ],
+    "reading_time_min": 6,
+    "status": "on_display"
+  }
+]

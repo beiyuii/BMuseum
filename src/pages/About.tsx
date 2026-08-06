@@ -1,6 +1,7 @@
 import "./About.css";
 import { useReveal } from "../hooks/useReveal";
-import { projects, socials } from "../data/content";
+import { socials } from "../data/content";
+import { useMuseumData } from "../data/MuseumDataContext";
 
 /* ------------------------------------------------------------------ */
 /*  Reveal wrapper – one per section                                   */
@@ -75,6 +76,14 @@ const ACCENT_CLASSES: Record<string, string> = {
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 export default function About() {
+  const { projects, loading } = useMuseumData();
+  if (loading) {
+    return (
+      <main className="about">
+        <div className="loading">策展中…</div>
+      </main>
+    );
+  }
   return (
     <main className="about">
       {/* ============================================================

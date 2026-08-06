@@ -12,6 +12,8 @@ import ArticleDetail from "./pages/ArticleDetail";
 import Index from "./pages/Index";
 import Projects from "./pages/Projects";
 import Guestbook from "./pages/Guestbook";
+import Admin from "./pages/Admin";
+import { MuseumDataProvider } from "./data/MuseumDataContext";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -53,6 +55,7 @@ function AppContent() {
         <Route path="/index" element={<Index />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/guestbook" element={<Guestbook />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
       <Footer className={isGrandHall ? "footer--grand-hall" : undefined} />
       {visitor && (
@@ -69,7 +72,9 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <MuseumDataProvider>
+        <AppContent />
+      </MuseumDataProvider>
     </BrowserRouter>
   );
 }

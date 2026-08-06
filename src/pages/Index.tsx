@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { articles, wings } from '../data/content';
+import { wings } from '../data/content';
+import { useMuseumData } from '../data/MuseumDataContext';
 import type { Article, Wing, WingSlug } from '../types';
 import './Index.css';
 
@@ -55,10 +56,21 @@ function ArticleRow({ article, onClick }: RowProps) {
 
 export default function Index() {
   const navigate = useNavigate();
+  const { articles, loading } = useMuseumData();
   const [mode, setMode] = useState<ViewMode>('time');
   const [query, setQuery] = useState('');
 
-  const filtered = useMemo(() => articles.filter(a => matchesQuery(a, query)), [query]);
+  const filtered = useMemo(() => articles.filter(a => matchesQuery(a, query)), [articles, query]);
+
+  if (loading) {
+    return (
+      <main className="index-page">
+        <div className="container">
+          <div className="loading">策展中…</div>
+        </div>
+      </main>
+    );
+  }
 
   /* ── Grouped views ── */
 

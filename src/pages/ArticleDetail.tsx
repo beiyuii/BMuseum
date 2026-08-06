@@ -1,6 +1,7 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { articles as visibleArticles, allArticles, wings as wingsList } from '../data/content';
+import { wings as wingsList } from '../data/content';
+import { useMuseumData } from '../data/MuseumDataContext';
 import './ArticleDetail.css';
 
 /* ── simple markdown → HTML ───────────────────────────────── */
@@ -86,6 +87,7 @@ export default function ArticleDetail() {
   const navigate = useNavigate();
   const bodyRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
+  const { articles, allArticles, loading } = useMuseumData();
 
   // 直链允许命中库房文章（下方渲染撤展提示），列表与上一/下一篇只走展出中的文章
   const article = allArticles.find((a) => a.slug === slug);
@@ -94,7 +96,7 @@ export default function ArticleDetail() {
 
   // prev / next within same wing
   const wingArticles = article
-    ? visibleArticles.filter((a) => a.wing === article.wing).sort((a, b) => a.no - b.no)
+    ? articles.filter((a) => a.wing === article.wing).sort((a, b) => a.no - b.no)
     : [];
   const idx = wingArticles.findIndex((a) => a.slug === slug);
   const prev = idx > 0 ? wingArticles[idx - 1] : undefined;
@@ -119,6 +121,16 @@ export default function ArticleDetail() {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  if (loading) {
+    return (
+      <div className="article-detail not-found">
+        <h2>策展中…</h2>
+        <p>正在从馆藏调取展品。</p>
+        <Link to="/index" className="back-link">← 返回目录</Link>
+      </div>
+    );
+  }
 
   if (!article || !wing) {
     return (
